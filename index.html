@@ -1,72 +1,64 @@
 <!doctype html>
 <html lang="bn">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#090909"><title>ArenaX — Free Fire Tournament</title>
-<style>
-:root{--bg:#090909;--panel:#171512;--gold:#d6ad55;--gold2:#f4d98a;--text:#f6f1e7;--muted:#aaa294;--line:#393226}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -10%,#4b3717 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,sans-serif}
-.wrap{width:min(1050px,calc(100% - 30px));margin:auto}header{position:sticky;top:0;background:#090909ed;border-bottom:1px solid var(--line);z-index:5}
-.nav{height:64px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:24px;font-weight:950;letter-spacing:2px}.brand span,.gold{color:var(--gold2)}
-nav{display:flex;gap:16px}nav a{color:var(--muted);text-decoration:none;font-size:13px}
-.btn{border:1px solid var(--gold);border-radius:9px;padding:10px 15px;background:linear-gradient(135deg,var(--gold2),#b78632);color:#17120a;font-weight:850;cursor:pointer}
-.btn.dark{background:#24211b;color:var(--text)}.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:25px;align-items:center;padding:55px 0 35px}
-.hero h1{font-size:clamp(40px,7vw,72px);line-height:.98;margin:14px 0}.eyebrow{color:var(--gold2);font-weight:900;letter-spacing:2px;font-size:12px}
-.art{height:240px;border:1px solid #66502b;border-radius:22px;background:linear-gradient(145deg,#312514,#17130e 55%,#0d0d0d);display:grid;place-items:center;font-size:90px}
-.stats,.cards,.cols{display:grid;gap:13px}.stats{grid-template-columns:repeat(3,1fr);margin:10px 0 30px}.cards{grid-template-columns:repeat(3,1fr)}.cols{grid-template-columns:1fr 1fr}
-.panel,.stat,.match{background:linear-gradient(145deg,#1a1916,#111);border:1px solid var(--line);border-radius:14px;padding:17px}
-.stat b{display:block;color:var(--gold2);font-size:19px}.muted,.hint{color:var(--muted)}section{padding:20px 0 28px;scroll-margin-top:75px}
-.field{margin:12px 0}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
-input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#0b0b0b;color:white}
-.msg{padding:10px;background:#282116;color:var(--gold2);border-radius:8px;white-space:pre-wrap}.hidden{display:none!important}
-.prize{font-size:25px;color:var(--gold2);font-weight:900}.tag{color:var(--gold2);font-size:11px}
-table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:9px;border-bottom:1px solid var(--line);font-size:12px}th{color:var(--gold2)}.table{overflow:auto}
-footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:12px}
-@media(max-width:720px){nav{display:none}.hero,.cols{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.art{height:170px}.stats{gap:7px}.stat{padding:11px}.stat b{font-size:15px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090909">
+  <title>ArenaX — Free Fire Tournament</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand">ARENA<span>X</span></a><nav><a href="#tournaments">Tournaments</a><a href="#account">Account</a><a href="#wallet">Wallet</a><a href="#leaderboard">Leaderboard</a></nav><a class="btn" href="#account">PLAY NOW</a></div></header>
+<header class="topbar">
+  <a class="brand" href="#">ARENA<span>X</span></a>
+  <nav><a href="#tournaments">Tournaments</a><a href="#register">Join Match</a><a href="#wallet">Wallet</a><a href="#leaderboard">Leaderboard</a><a href="#admin" id="adminLink" class="hide">Admin</a></nav>
+  <a class="btn" href="#account">PLAY NOW</a>
+</header>
 <main class="wrap">
-<section class="hero"><div><div class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</div><h1>RULE THE<br><span class="gold">BATTLEGROUND.</span></h1><p class="muted">Join Solo, Duo and Squad tournaments. Compete with the best players and claim your victory.</p><a class="btn" href="#tournaments">Explore Tournaments</a></div><div class="art">♛</div></section>
-<div class="stats"><div class="stat"><b>SOLO • DUO • SQUAD</b><small>Multiple match formats</small></div><div class="stat"><b>৳ BDT</b><small>Bangladesh payment requests</small></div><div class="stat"><b>24/7</b><small>Community arena</small></div></div>
-<section id="tournaments"><div class="eyebrow">FIND YOUR MATCH</div><h2>Featured Tournaments</h2><p class="muted">Live tournament listings</p><div id="tournamentList" class="cards"><div class="match">লোড হচ্ছে...</div></div></section>
-<section id="account"><div class="eyebrow">PLAYER ACCESS</div><h2>Account</h2><div class="cols"><div class="panel"><h3>Create your account</h3><form id="signup"><div class="field"><label>Player name</label><input name="name" maxlength="40" required></div><div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Password (at least 8 characters)</label><input name="password" type="password" minlength="8" required></div><button class="btn">Sign Up</button></form></div><div class="panel"><h3>Welcome back</h3><form id="login"><div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div><button class="btn">Login</button> <button class="btn dark" type="button" id="logout">Logout</button></form><p id="session" class="hint">Not signed in</p></div></div><p id="message" class="msg hidden"></p></section>
-<section id="register"><div class="eyebrow">ENTER THE ARENA</div><h2>Tournament Registration</h2><div class="panel"><form id="regForm"><div class="cols"><div class="field"><label>Select tournament</label><select name="tournament_id" id="tournamentSelect" required></select></div><div class="field"><label>Player / Team name</label><input name="player_name" required maxlength="40"></div><div class="field"><label>Free Fire UID</label><input name="free_fire_uid" pattern="[0-9]{5,20}" required></div><div class="field"><label>Team name (Duo / Squad)</label><input name="team_name" maxlength="40"></div></div><button class="btn">Submit Registration</button></form><p class="hint">Sign in first. Entry fee processing depends on your database setup.</p></div></section>
-<section id="wallet"><div class="eyebrow">PLAYER FUNDS</div><h2>Wallet & Payments</h2><div class="cols"><div class="panel"><h3>Available Balance</h3><div id="balance" class="prize">৳ —</div><form id="paymentForm"><div class="field"><label>Request type</label><select name="request_type"><option value="deposit">Add Money</option><option value="withdraw">Withdraw</option></select></div><div class="field"><label>Amount (BDT)</label><input name="amount" type="number" min="1" max="100000" required></div><div class="field"><label>Payment method</label><select name="method"><option>bKash</option><option>Nagad</option></select></div><div class="field"><label>Transaction ID / Payout number</label><input name="transaction_ref" minlength="4" maxlength="100" required></div><button class="btn">Send Request</button></form></div><div class="panel"><h3>Payment History</h3><div class="table"><table><thead><tr><th>Type</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead><tbody id="paymentHistory"><tr><td colspan="4">Login to view history.</td></tr></tbody></table></div><p class="hint">Manual verification only. This is not an automatic bKash/Nagad gateway.</p></div></div></section>
-<section id="leaderboard"><div class="eyebrow">TOP PLAYERS</div><h2>Leaderboard</h2><div class="panel table"><table><thead><tr><th>Rank</th><th>Player</th><th>Placement</th><th>Points</th></tr></thead><tbody id="leaderboardRows"><tr><td colspan="4">No published results yet.</td></tr></tbody></table></div></section>
-</main><footer><div class="wrap">© 2026 ArenaX. Not affiliated with Garena or Free Fire. Never share your password, OTP or payment PIN.</div></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* Add your Supabase Project URL below. Use ONLY the publishable key in browser code. */
-const SUPABASE_URL = "https://pzogiovqbudtdfxukmlt.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_tFNFTITPaOKdeUNZJX9Ntw_tg8cBUaa";
-const configured = SUPABASE_URL.startsWith("https://") && !SUPABASE_URL.includes("PASTE_");
-const db = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
-const $ = s => document.querySelector(s);
-const money = n => "৳ " + Number(n || 0).toLocaleString("en-BD",{maximumFractionDigits:2});
-function say(t,bad=false){const m=$("#message");m.textContent=t;m.classList.remove("hidden");m.style.color=bad?"#ff9b91":"#f4d98a"}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-async function currentUser(){if(!db)return null;const {data}=await db.auth.getUser();return data.user}
-async function refresh(){
- if(!db){$("#tournamentList").innerHTML='<div class="match">Setup needed: add your Supabase Project URL in this file.</div>';return}
- const u=await currentUser();$("#session").textContent=u?`Signed in: ${u.email}`:"Not signed in";
- const {data:ts,error}=await db.from("tournaments").select("*").in("status",["open","closed","completed"]).order("created_at",{ascending:false});
- if(error){say(error.message,true);return}
- $("#tournamentList").innerHTML=(ts||[]).length?ts.map(t=>`<article class="match"><span class="tag">${esc(t.mode)} MATCH</span><h3>${esc(t.title)}</h3><p class="muted">${esc(t.description||"Compete in ArenaX.")}</p><div class="prize">${money(t.prize_pool)}</div><p class="muted">Entry ${money(t.entry_fee)} • Slots ${t.max_slots}</p><button class="btn" onclick="document.querySelector('#tournamentSelect').value='${t.id}';location.hash='#register'">Join Match</button></article>`).join(""):'<div class="match">No tournaments published yet.</div>';
- $("#tournamentSelect").innerHTML=(ts||[]).filter(t=>t.status==="open").map(t=>`<option value="${t.id}">${esc(t.title)} — ${esc(t.mode)}</option>`).join("");
- if(u){
-  const {data:b,error:be}=await db.rpc("my_wallet_balance");$("#balance").textContent=be?"৳ —":money(b);
-  const {data:ps,error:pe}=await db.from("payment_requests").select("id,request_type,amount,method,status").order("created_at",{ascending:false});
-  $("#paymentHistory").innerHTML=pe?`<tr><td colspan="4">${esc(pe.message)}</td></tr>`:(ps||[]).map(x=>`<tr><td>${esc(x.request_type)}</td><td>${money(x.amount)}</td><td>${esc(x.method)}</td><td>${esc(x.status)}</td></tr>`).join("")||'<tr><td colspan="4">No requests yet.</td></tr>';
- }else{$("#balance").textContent="৳ —";$("#paymentHistory").innerHTML='<tr><td colspan="4">Login to view history.</td></tr>'}
- const {data:rs}=await db.from("match_results").select("player_name,placement,points").order("placement").limit(100);
- $("#leaderboardRows").innerHTML=(rs||[]).map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.player_name)}</td><td>${r.placement}</td><td>${r.points}</td></tr>`).join("")||'<tr><td colspan="4">No published results yet.</td></tr>';
-}
-$("#signup").onsubmit=async e=>{e.preventDefault();if(!db)return say("আগে Project URL বসাতে হবে।",true);const f=new FormData(e.target);const {error}=await db.auth.signUp({email:f.get("email"),password:f.get("password"),options:{data:{display_name:f.get("name")}}});if(error)say(error.message,true);else{say("Account created. Email confirmation লাগলে inbox দেখো।");e.target.reset();await refresh()}};
-$("#login").onsubmit=async e=>{e.preventDefault();if(!db)return say("আগে Project URL বসাতে হবে।",true);const f=new FormData(e.target);const {error}=await db.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});if(error)say(error.message,true);else{say("Login successful.");await refresh()}};
-$("#logout").onclick=async()=>{if(db){const {error}=await db.auth.signOut();if(error)say(error.message,true);await refresh()}};
-$("#regForm").onsubmit=async e=>{e.preventDefault();const u=await currentUser();if(!u)return say("Please login first.",true);const f=new FormData(e.target);const {error}=await db.rpc("register_for_tournament",{p_tournament_id:f.get("tournament_id"),p_player_name:f.get("player_name"),p_free_fire_uid:f.get("free_fire_uid"),p_team_name:f.get("team_name")||null});if(error)say(error.message,true);else{say("Registration submitted.");e.target.reset();await refresh()}};
-$("#paymentForm").onsubmit=async e=>{e.preventDefault();const u=await currentUser();if(!u)return say("Please login first.",true);const f=new FormData(e.target);const {error}=await db.from("payment_requests").insert({request_type:f.get("request_type"),amount:Number(f.get("amount")),method:f.get("method"),transaction_ref:f.get("transaction_ref")});if(error)say(error.message,true);else{say("Request submitted; pending admin verification.");e.target.reset();await refresh()}};
-if(db)db.auth.onAuthStateChange(()=>refresh());refresh();
-</script></body></html>
+  <section class="hero">
+    <div><p class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</p><h1>RULE THE<br><span>BATTLEGROUND.</span></h1>
+    <p class="muted">Join Solo, Duo and Squad tournaments, compete with players and claim victory.</p>
+    <a class="btn" href="#tournaments">Explore Tournaments →</a></div>
+    <div class="hero-art"><div>♛</div></div>
+  </section>
+  <div class="stats"><div class="stat"><b>SOLO • DUO • SQUAD</b><small>Multiple match formats</small></div><div class="stat"><b>৳ BDT</b><small>Bangladesh payment requests</small></div><div class="stat"><b>24/7</b><small>Community arena</small></div></div>
+
+  <section id="tournaments"><div class="section-head"><div><p class="eyebrow">FIND YOUR MATCH</p><h2>Featured Tournaments</h2></div><small class="muted">Live tournament listings</small></div><div id="tournamentList" class="cards"><p class="panel">Loading tournaments...</p></div></section>
+
+  <section id="account"><p class="eyebrow">PLAYER ACCESS</p><h2>Account</h2><div class="cols">
+    <form id="signup" class="panel"><h3>Create your account</h3><label>Player name<input name="name" maxlength="40" required></label><label>Email<input name="email" type="email" required></label><label>Password (minimum 6 characters)<input name="password" type="password" minlength="6" required></label><button class="btn">Sign Up</button></form>
+    <form id="login" class="panel"><h3>Welcome back</h3><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button class="btn">Login</button> <button class="btn secondary" type="button" id="logout">Logout</button><p id="session" class="muted">Not signed in</p></form>
+  </div><div id="message" class="message hide" role="status"></div></section>
+
+  <section id="register"><p class="eyebrow">ENTER THE ARENA</p><h2>Tournament Registration</h2><form id="registrationForm" class="panel form-grid">
+    <label>Select tournament<select name="tournamentId" id="tournamentSelect" required><option value="">Choose a tournament</option></select></label>
+    <label>Player / Team name<input name="playerName" maxlength="40" required></label>
+    <label>Free Fire UID<input name="uid" inputmode="numeric" pattern="[0-9]{5,20}" required></label>
+    <label>Team name (Duo / Squad)<input name="teamName" maxlength="40"></label>
+    <button class="btn">Submit Registration</button><p class="hint">Login first. Admin will review registrations.</p>
+  </form></section>
+
+  <section id="wallet"><p class="eyebrow">PLAYER FUNDS</p><h2>Wallet & Payments</h2><div class="cols">
+    <div class="panel"><h3>Wallet requests</h3><p class="muted">Balance: <b id="balance">৳ 0</b></p><form id="paymentForm">
+      <label>Request type<select name="type"><option value="deposit">Add Money</option><option value="withdraw">Withdraw</option></select></label>
+      <label>Amount (BDT)<input name="amount" type="number" min="1" max="100000" step="1" required></label>
+      <label>Payment method<select name="method"><option>bKash</option><option>Nagad</option></select></label>
+      <label>Transaction ID / Payout number<input name="reference" minlength="4" maxlength="100" required></label>
+      <button class="btn">Send Request</button></form>
+    </div>
+    <div class="panel"><h3>My payment requests</h3><div class="table-scroll"><table><thead><tr><th>Type</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead><tbody id="paymentRows"><tr><td colspan="4">Login to view.</td></tr></tbody></table></div><p class="hint">Manual verification only. Do not enter PIN, OTP or password.</p></div>
+  </div></section>
+
+  <section id="leaderboard"><p class="eyebrow">TOP PLAYERS</p><h2>Leaderboard</h2><div class="panel table-scroll"><table><thead><tr><th>Rank</th><th>Player</th><th>Placement</th><th>Points</th></tr></thead><tbody id="leaderboardRows"><tr><td colspan="4">No results published.</td></tr></tbody></table></div></section>
+
+  <section id="admin" class="hide"><p class="eyebrow">CONTROL CENTER</p><h2>Admin Panel</h2>
+    <div class="cols">
+      <form id="createTournament" class="panel"><h3>Create tournament</h3><label>Title<input name="title" maxlength="100" required></label><label>Mode<select name="mode"><option>Solo</option><option>Duo</option><option>Squad</option></select></label><label>Description<input name="description" maxlength="400"></label><label>Entry fee (৳)<input name="entryFee" type="number" min="0" required></label><label>Prize pool (৳)<input name="prizePool" type="number" min="0" required></label><label>Maximum slots<input name="slots" type="number" min="1" max="500" value="48" required></label><label>Start time<input name="startsAt" type="datetime-local"></label><button class="btn">Publish Tournament</button></form>
+      <div class="panel"><h3>Pending payments</h3><div class="table-scroll"><table><thead><tr><th>User</th><th>Details</th><th>Action</th></tr></thead><tbody id="adminPayments"><tr><td colspan="3">Admin only.</td></tr></tbody></table></div></div>
+    </div>
+    <div class="panel gap-top"><h3>Registrations</h3><div class="table-scroll"><table><thead><tr><th>Player</th><th>UID</th><th>Tournament</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminRegistrations"><tr><td colspan="5">Admin only.</td></tr></tbody></table></div></div>
+    <form id="resultForm" class="panel form-grid gap-top"><h3 class="full">Publish match result</h3><label>Player name<input name="player" required></label><label>Placement<input name="placement" type="number" min="1" required></label><label>Points<input name="points" type="number" min="0" required></label><label>Tournament ID<input name="tournamentId" required></label><button class="btn">Publish Result</button></form>
+  </section>
+</main>
+<footer>© 2026 ArenaX. Independent community tournament platform; not affiliated with Garena or Free Fire.</footer>
+<script type="module" src="app.js"></script>
+</body></html>
