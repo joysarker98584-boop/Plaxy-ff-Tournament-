@@ -22,7 +22,8 @@ import {
   where,
   orderBy,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // Firebase Config
@@ -68,6 +69,7 @@ let tournaments = [];
 
 function message(txt, bad = false) {
   const el = $("#message");
+
   if (!el) {
     console.log(txt);
     return;
@@ -416,10 +418,9 @@ async function loadAdmin() {
 }
 
 // SIGNUP
-$("#signup").addEventListener("submit", async e => {
+$("#signup")?.addEventListener("submit", async e => {
   e.preventDefault();
 
-  // Form reference আগে ধরে রাখা হচ্ছে
   const form = e.currentTarget;
   const f = formData(form);
 
@@ -451,7 +452,7 @@ $("#signup").addEventListener("submit", async e => {
 
 
 // LOGIN
-$("#login").addEventListener("submit", async e => {
+$("#login")?.addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
@@ -474,7 +475,7 @@ $("#login").addEventListener("submit", async e => {
 
 
 // LOGOUT
-$("#logout").addEventListener("click", async () => {
+$("#logout")?.addEventListener("click", async () => {
   try {
     await signOut(auth);
     message("Logout হয়েছে।");
@@ -484,8 +485,8 @@ $("#logout").addEventListener("click", async () => {
 });
 
 
-// PLAYER REGISTRATION
-$("#registrationForm").addEventListener("submit", async e => {
+// AUTOMATIC TOURNAMENT JOIN
+$("#registrationForm")?.addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
@@ -504,33 +505,134 @@ $("#registrationForm").addEventListener("submit", async e => {
     return message("টুর্নামেন্ট বেছে নাও।", true);
   }
 
+  const fee = Number(t.entryFee || 0);
+
+  if (!Number.isFinite(fee) || fee < 0) {
+    return message("Entry Fee সঠিক নয়।", true);
+  }
+
+  // একই User একই Tournament-এ একবারই Join করতে পারবে
+  const registrationId = `${t.id}_${currentUser.uid}`;
+
+  const tournamentRef = doc(db, "tournaments", t.id);
+  const registrationRef = doc(db, "registrations", registrationId);
+
+  // Wallet transaction history
+  const paymentRef = doc(collection(db, "paymentRequests"));
+
   try {
-    await addDoc(collection(db, "registrations"), {
-      userId: currentUser.uid,
-      userEmail: currentUser.email,
-      tournamentId: t.id,
-      tournamentTitle: t.title,
-      playerName: f.playerName,
-      uid: f.uid,
-      teamName: f.teamName || "",
-      status: "pending",
-      createdAt: serverTimestamp()
+    await runTransaction(db, async transaction => {
+
+      // প্রথমে Tournament ও Registration পড়া
+      const tournamentSnap = await transaction.get(tournamentRef);
+      const registrationSnap = await transaction.get(registrationRef);
+
+      if (!tournamentSnap.exists()) {
+        throw new Error("Tournament পাওয়া যায়নি।");
+      }
+
+      if (registrationSnap.exists()) {
+        throw new Error("তুমি ইতিমধ্যে এই Tournament-এ Join করেছো।");
+      }
+
+      const tournament = tournamentSnap.data();
+
+      if (tournament.status !== "open") {
+        throw new Error("এই Tournament এখন Join করার জন্য খোলা নেই।");
+      }
+
+      const joined = Number(tournament.joined || 0);
+      const slots = Number(tournament.slots || 0);
+      const currentFee = Number(tournament.entryFee || 0);
+
+      if (currentFee !== fee) {
+        throw new Error("Entry Fee পরিবর্তন হয়েছে। আবার চেষ্টা করো।");
+      }
+
+      if (joined >= slots) {
+        throw new Error("দুঃখিত! Tournament-এর সব Slot পূর্ণ।");
+      }
+
+      // User-এর Payment History পড়া
+      const paymentQuery = query(
+        collection(db, "paymentRequests"),
+        where("userId", "==", currentUser.uid)
+      );
+
+      const paymentSnap = await transaction.get(paymentQuery);
+
+      // Approved Deposit - Approved Withdrawals - Tournament Fees
+      const balance = paymentSnap.docs.reduce((sum, d) => {
+        const p = d.data();
+
+        if (p.status !== "approved") {
+          return sum;
+        }
+
+        const amount = Number(p.amount || 0);
+
+        return sum + (
+          p.type === "deposit" ? amount : -amount
+        );
+      }, 0);
+
+      if (balance < fee) {
+        throw new Error(
+          `Wallet-এ পর্যাপ্ত টাকা নেই। প্রয়োজন ${money(fee)}, আছে ${money(balance)}।`
+        );
+      }
+
+      // Automatic Registration
+      transaction.set(registrationRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        tournamentId: t.id,
+        tournamentTitle: tournament.title,
+        playerName: f.playerName,
+        uid: f.uid,
+        teamName: f.teamName || "",
+        status: "approved",
+        entryFee: fee,
+        createdAt: serverTimestamp()
+      });
+
+      // Tournament Slot Update
+      transaction.update(tournamentRef, {
+        joined: joined + 1
+      });
+
+      // Wallet থেকে Entry Fee কেটে রাখা
+      transaction.set(paymentRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        type: "tournament_fee",
+        amount: fee,
+        method: "Wallet",
+        reference: `Tournament: ${t.id}`,
+        status: "approved",
+        createdAt: serverTimestamp()
+      });
     });
 
-    message("রেজিস্ট্রেশন জমা হয়েছে। Admin অনুমোদন করবেন।");
+    message(
+      "অভিনন্দন! Tournament-এ Join সফল হয়েছে। Entry Fee কেটে নেওয়া হয়েছে।"
+    );
 
     form.reset();
 
     await loadPlayer();
+    await loadTournaments();
+    await loadAdmin();
 
   } catch (err) {
-    message(err.message, true);
+    console.error("Tournament Join Error:", err);
+    message(err.message || "Join করা যায়নি। আবার চেষ্টা করো।", true);
   }
 });
 
 
 // PAYMENT REQUEST
-$("#paymentForm").addEventListener("submit", async e => {
+$("#paymentForm")?.addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
@@ -576,7 +678,7 @@ $("#paymentForm").addEventListener("submit", async e => {
 
 
 // CREATE TOURNAMENT (ADMIN)
-$("#createTournament").addEventListener("submit", async e => {
+$("#createTournament")?.addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
@@ -617,7 +719,7 @@ $("#createTournament").addEventListener("submit", async e => {
 
 
 // PUBLISH RESULT (ADMIN)
-$("#resultForm").addEventListener("submit", async e => {
+$("#resultForm")?.addEventListener("submit", async e => {
   e.preventDefault();
 
   const form = e.currentTarget;
