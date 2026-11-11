@@ -2,9 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, addDoc, getDoc, getDocs, query, where, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 alert("JavaScript চালু হয়েছে!");
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBKOUb6yOMDKN6h5lnaZuZvFXUAnEc4fT0",
+  apiKey: "AIzaSyBKOUb6yOmDKN6h5lnaZuZvFXUAnEc4fT0",
   authDomain: "arenax-free-fire-tournament.firebaseapp.com",
+  databaseURL: "https://arenax-free-fire-tournament-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "arenax-free-fire-tournament",
   storageBucket: "arenax-free-fire-tournament.firebasestorage.app",
   messagingSenderId: "462385161284",
