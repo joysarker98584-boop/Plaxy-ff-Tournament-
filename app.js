@@ -127,4 +127,3 @@ if(auth) onAuthStateChanged(auth,async user=>{
   try{await refreshPlayerData();if(isAdmin)await loadAdmin();}catch(e){showMessage(e.message,true);}
 });
 if(configured){refreshTournaments().catch(e=>showMessage(e.message,true));refreshLeaderboard().catch(e=>showMessage(e.message,true));}
-  
