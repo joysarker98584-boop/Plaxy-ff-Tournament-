@@ -1,3 +1,6 @@
+// ArenaX Free Fire Tournament — app.js
+// Firebase SDK 11.6.0
+// HTML IDs matched with the supplied index.html.
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
@@ -26,7 +29,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-// FIREBASE CONFIG
+// 1) FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBKOUb6yOmDKN6h5lnaZuZvFXUAnEc4fT0",
   authDomain: "arenax-free-fire-tournament.firebaseapp.com",
@@ -40,29 +43,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 const $ = (selector) => document.querySelector(selector);
 
 let currentUser = null;
 let isAdmin = false;
 let currentBalance = 0;
+let authReady = false;
 
-function showMessage(message, error = false) {
+function showMessage(message, isError = false) {
   const box = $("#message");
   if (!box) return;
-
   box.textContent = message;
+  box.classList.remove("hide");
   box.style.display = "block";
-  box.style.color = error ? "#ff5252" : "#21c77a";
+  box.style.color = isError ? "#ff5252" : "#21c77a";
 }
 
 function hideMessage() {
   const box = $("#message");
-  if (box) box.style.display = "none";
+  if (!box) return;
+  box.classList.add("hide");
+  box.style.display = "none";
 }
 
 function escapeHTML(value = "") {
-  return String(value).replace(/[&<>"']/g, char => ({
+  return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -71,258 +76,330 @@ function escapeHTML(value = "") {
   })[char]);
 }
 
+function money(value) {
+  const n = Number(value || 0);
+  return Number.isFinite(n) ? n.toLocaleString("en-BD") : "0";
+}
+
+// 2) PAGE NAVIGATION
 function page(name) {
-  document.querySelectorAll(".page").forEach(el => {
-    el.classList.remove("active");
+  document.querySelectorAll(".page").forEach((el) => {
+    el.classList.toggle("active", el.id === `page-${name}`);
   });
 
-  const target = $("#page-" + name);
-  if (target) target.classList.add("active");
-
-  document.querySelectorAll("[data-page]").forEach(el => {
+  document.querySelectorAll("[data-page]").forEach((el) => {
     el.classList.toggle("active", el.dataset.page === name);
   });
 
-  const drawer = $("#drawer");
-  if (drawer) drawer.classList.remove("open");
-
+  closeDrawer();
   hideMessage();
+
+  if (name === "leaderboard") loadLeaderboard();
+  if (name === "admin" && isAdmin) loadAdminData();
+  if (name === "myMatches" && currentUser) loadPlayerData();
+  if (name === "wallet" && currentUser) loadPlayerData();
 }
 
-document.querySelectorAll("[data-page]").forEach(button => {
-  button.addEventListener("click", () => {
-    page(button.dataset.page);
-  });
+document.querySelectorAll("[data-page]").forEach((el) => {
+  el.addEventListener("click", () => page(el.dataset.page));
 });
 
-// SIGN UP
-$("#signupForm")?.addEventListener("submit", async e => {
-  e.preventDefault();
+function openDrawer() {
+  $("#drawer")?.classList.add("open");
+  $("#scrim")?.classList.add("show");
+}
 
-  const f = Object.fromEntries(new FormData(e.target));
+function closeDrawer() {
+  $("#drawer")?.classList.remove("open");
+  $("#scrim")?.classList.remove("show");
+}
+
+$("#menuToggle")?.addEventListener("click", openDrawer);
+$("#drawerClose")?.addEventListener("click", closeDrawer);
+$("#scrim")?.addEventListener("click", closeDrawer);
+
+$("#copyNumber")?.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText("01346022330");
+    showMessage("পেমেন্ট নম্বর কপি হয়েছে।");
+  } catch {
+    showMessage("নম্বর: 01346022330", false);
+  }
+});
+
+// 3) SIGN UP — HTML form ID is "signup"
+$("#signup")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const f = Object.fromEntries(new FormData(form));
+  const name = String(f.name || "").trim();
+  const email = String(f.email || "").trim().toLowerCase();
+  const password = String(f.password || "");
+
+  if (!name || !email || password.length < 6) {
+    showMessage("নাম, সঠিক Email এবং কমপক্ষে ৬ অক্ষরের Password দাও।", true);
+    return;
+  }
 
   try {
-    const credential = await createUserWithEmailAndPassword(
-      auth,
-      f.email,
-      f.password
-    );
-
-    await updateProfile(credential.user, {
-      displayName: f.name
-    });
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(credential.user, { displayName: name });
 
     await setDoc(doc(db, "users", credential.user.uid), {
-      displayName: f.name,
-      email: f.email,
+      displayName: name,
+      email,
       role: "player",
       createdAt: serverTimestamp()
     });
 
-    showMessage("Account তৈরি হয়েছে!");
-    e.target.reset();
-
+    form.reset();
+    showMessage("Account তৈরি হয়েছে। স্বাগতম!");
   } catch (error) {
+    console.error("Signup error:", error);
     showMessage(error.message, true);
   }
 });
 
-// LOGIN
-$("#loginForm")?.addEventListener("submit", async e => {
+// 4) LOGIN — HTML form ID is "login"
+$("#login")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const f = Object.fromEntries(new FormData(e.target));
+  const form = e.currentTarget;
+  const f = Object.fromEntries(new FormData(form));
 
   try {
-    await signInWithEmailAndPassword(auth, f.email, f.password);
+    await signInWithEmailAndPassword(
+      auth,
+      String(f.email || "").trim().toLowerCase(),
+      String(f.password || "")
+    );
+    form.reset();
     showMessage("Login সফল হয়েছে!");
-    e.target.reset();
+  } catch (error) {
+    console.error("Login error:", error);
+    showMessage(error.message, true);
+  }
+});
+
+// 5) LOGOUT
+$("#logout")?.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    page("home");
+    showMessage("Logout হয়েছে।");
   } catch (error) {
     showMessage(error.message, true);
   }
 });
 
-// LOGOUT
-$("#logout")?.addEventListener("click", async () => {
-  await signOut(auth);
-  page("home");
-  showMessage("Logout হয়েছে!");
-});
-
-// NAVIGATION BUTTONS
 $("#topLogin")?.addEventListener("click", () => page("account"));
 $("#topSignup")?.addEventListener("click", () => page("account"));
-$("#drawerAdmin")?.addEventListener("click", () => {
-  if (isAdmin) page("admin");
-  else showMessage("শুধু Admin প্রবেশ করতে পারবে", true);
-});
 
-// AUTH STATE
-onAuthStateChanged(auth, async user => {
+// 6) AUTH STATE
+onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   isAdmin = false;
+  authReady = true;
 
-  if (user) {
-    const userSnap = await getDoc(doc(db, "users", user.uid));
+  try {
+    if (user) {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
 
-    if (userSnap.exists()) {
-      isAdmin = userSnap.data().role === "admin";
+      if (userSnap.exists()) {
+        isAdmin = userSnap.data().role === "admin";
+      }
+
+      if ($("#session")) {
+        $("#session").textContent = user.displayName || user.email || "Logged in";
+      }
+      if ($("#logout")) $("#logout").style.display = "inline-flex";
+      if ($("#drawerAdmin")) {
+        $("#drawerAdmin").classList.toggle("hide", !isAdmin);
+        $("#drawerAdmin").style.display = isAdmin ? "block" : "none";
+      }
+
+      $("#topLogin")?.classList.add("hide");
+      $("#topSignup")?.classList.add("hide");
+
+      await loadTournaments();
+      await loadPlayerData();
+      await loadLeaderboard();
+      if (isAdmin) await loadAdminData();
+    } else {
+      if ($("#session")) $("#session").textContent = "Login করা হয়নি";
+      if ($("#logout")) $("#logout").style.display = "none";
+      if ($("#drawerAdmin")) {
+        $("#drawerAdmin").classList.add("hide");
+        $("#drawerAdmin").style.display = "none";
+      }
+      $("#topLogin")?.classList.remove("hide");
+      $("#topSignup")?.classList.remove("hide");
+
+      currentBalance = 0;
+      if ($("#balance")) $("#balance").textContent = "৳ 0.00";
+      if ($("#myMatchesList")) $("#myMatchesList").textContent = "ম্যাচ দেখতে Login করো।";
+      if ($("#paymentRows")) $("#paymentRows").innerHTML = '<tr><td colspan="4">Login করলে দেখা যাবে।</td></tr>';
+
+      await loadTournaments();
+      await loadLeaderboard();
     }
-
-    if ($("#session")) {
-      $("#session").textContent =
-        user.displayName || user.email;
-    }
-
-    if ($("#drawerAdmin")) {
-      $("#drawerAdmin").style.display =
-        isAdmin ? "block" : "none";
-    }
-
-    if ($("#logout")) $("#logout").style.display = "block";
-
-    await loadTournaments();
-    await loadPlayerData();
-
-    if (isAdmin) await loadAdminData();
-
-  } else {
-    if ($("#session")) $("#session").textContent = "Guest";
-    if ($("#logout")) $("#logout").style.display = "none";
-    if ($("#drawerAdmin")) $("#drawerAdmin").style.display = "none";
-
-    currentBalance = 0;
-    if ($("#balance")) $("#balance").textContent = "৳0";
-    await loadTournaments();
+  } catch (error) {
+    console.error("Auth state error:", error);
+    showMessage("Account তথ্য লোড হয়নি: " + error.message, true);
   }
 });
 
-// LOAD TOURNAMENTS
+// 7) LOAD TOURNAMENTS
 async function loadTournaments() {
   try {
-    const q = query(
+    const snapshot = await getDocs(query(
       collection(db, "tournaments"),
       orderBy("createdAt", "desc")
-    );
+    ));
 
-    const snapshot = await getDocs(q);
-
-    const tournaments = snapshot.docs.map(d => ({
-      id: d.id,
-      ...d.data()
+    const tournaments = snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data()
     }));
 
-    const html = tournaments.map(t => `
-      <div class="tournament-card">
-        <h3>${escapeHTML(t.title)}</h3>
+    const cards = tournaments.map((t) => `
+      <article class="tournament-card">
+        <h3>${escapeHTML(t.title || "Tournament")}</h3>
         <p>Mode: ${escapeHTML(t.mode || "")}</p>
-        <p>Entry Fee: ৳${Number(t.entryFee || 0)}</p>
-        <p>Prize: ৳${Number(t.prizePool || 0)}</p>
+        <p>Entry Fee: ৳${money(t.entryFee)}</p>
+        <p>Prize: ৳${money(t.prizePool)}</p>
         <p>Players: ${Number(t.joined || 0)}/${Number(t.slots || 0)}</p>
         <p>Start: ${t.startsAt ? escapeHTML(new Date(t.startsAt).toLocaleString("bn-BD")) : "TBA"}</p>
-        <button type="button" onclick="joinTournament('${t.id}')">
-          Join Tournament
-        </button>
-      </div>
+        <button class="btn primary" type="button" onclick="joinTournament('${t.id}')">Join Tournament</button>
+      </article>
     `).join("");
 
     if ($("#tournamentList")) {
-      $("#tournamentList").innerHTML =
-        html || "<p>কোনো Tournament নেই।</p>";
+      $("#tournamentList").innerHTML = cards || '<div class="panel">কোনো Tournament নেই।</div>';
     }
-
     if ($("#homeTournamentList")) {
-      $("#homeTournamentList").innerHTML =
-        html || "<p>কোনো Tournament নেই।</p>";
+      $("#homeTournamentList").innerHTML = cards || '<div class="panel">এখনো Tournament প্রকাশ হয়নি।</div>';
     }
-
     if ($("#tournamentSelect")) {
+      const selected = $("#tournamentSelect").value;
       $("#tournamentSelect").innerHTML =
-        '<option value="">Tournament নির্বাচন করুন</option>' +
-        tournaments.map(t =>
-          `<option value="${t.id}">${escapeHTML(t.title)}</option>`
+        '<option value="">টুর্নামেন্ট বেছে নাও</option>' +
+        tournaments.map((t) =>
+          `<option value="${t.id}">${escapeHTML(t.title || "Tournament")}</option>`
         ).join("");
+      if (tournaments.some((t) => t.id === selected)) {
+        $("#tournamentSelect").value = selected;
+      }
     }
-
   } catch (error) {
-    console.error("Tournament load:", error);
+    console.error("Tournament load error:", error);
+    if ($("#tournamentList")) {
+      $("#tournamentList").innerHTML = '<div class="panel">Tournament লোড হয়নি। Firestore Rules পরীক্ষা করো।</div>';
+    }
   }
 }
 
-// JOIN TOURNAMENT
-window.joinTournament = async function(tournamentId) {
+// 8) JOIN BUTTON — sends player to the registration form
+window.joinTournament = async (tournamentId) => {
   if (!currentUser) {
-    showMessage("প্রথমে Login করুন।", true);
+    showMessage("প্রথমে Login করো।", true);
     page("account");
     return;
   }
 
-  const tournamentSnap = await getDoc(
-    doc(db, "tournaments", tournamentId)
-  );
+  try {
+    const tournamentSnap = await getDoc(doc(db, "tournaments", tournamentId));
+    if (!tournamentSnap.exists()) {
+      showMessage("Tournament পাওয়া যায়নি।", true);
+      return;
+    }
 
-  if (!tournamentSnap.exists()) {
-    showMessage("Tournament পাওয়া যায়নি।", true);
-    return;
+    const t = tournamentSnap.data();
+    if (Number(t.joined || 0) >= Number(t.slots || 0)) {
+      showMessage("এই Tournament-এর Slot পূর্ণ।", true);
+      return;
+    }
+
+    const existing = await getDocs(query(
+      collection(db, "registrations"),
+      where("userId", "==", currentUser.uid),
+      where("tournamentId", "==", tournamentId)
+    ));
+
+    if (!existing.empty) {
+      showMessage("এই Tournament-এ তোমার আবেদন আগে থেকেই আছে।", true);
+      page("myMatches");
+      return;
+    }
+
+    if ($("#tournamentSelect")) $("#tournamentSelect").value = tournamentId;
+    page("myMatches");
+    showMessage("নিচের Registration Form পূরণ করে Submit করো।");
+  } catch (error) {
+    console.error("Join tournament error:", error);
+    showMessage(error.message, true);
   }
-
-  const t = tournamentSnap.data();
-
-  if (Number(t.joined || 0) >= Number(t.slots || 0)) {
-    showMessage("Tournament-এর Slot পূর্ণ!", true);
-    return;
-  }
-
-  const existing = await getDocs(query(
-    collection(db, "registrations"),
-    where("userId", "==", currentUser.uid),
-    where("tournamentId", "==", tournamentId)
-  ));
-
-  if (!existing.empty) {
-    showMessage("তুমি ইতিমধ্যে আবেদন করেছ।", true);
-    return;
-  }
-
-  $("#registrationForm")?.querySelector('[name="tournamentId"]') &&
-    ($("#registrationForm").querySelector('[name="tournamentId"]').value = tournamentId);
-
-  page("myMatches");
-  showMessage("Registration Form পূরণ করে Submit করো।");
 };
 
-// REGISTRATION FORM
-$("#registrationForm")?.addEventListener("submit", async e => {
+// 9) REGISTRATION FORM
+$("#registrationForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const form = e.currentTarget;
 
   if (!currentUser) {
     showMessage("প্রথমে Login করো।", true);
+    page("account");
     return;
   }
 
-  const f = Object.fromEntries(new FormData(e.target));
+  const f = Object.fromEntries(new FormData(form));
+  const tournamentId = String(f.tournamentId || "").trim();
+  const playerName = String(f.playerName || "").trim();
+  const uid = String(f.uid || "").trim();
+  const teamName = String(f.teamName || "").trim();
+
+  if (!tournamentId || !playerName || !/^[0-9]{5,20}$/.test(uid)) {
+    showMessage("Tournament, Player Name এবং সঠিক ৫–২০ সংখ্যার Free Fire UID দাও।", true);
+    return;
+  }
 
   try {
+    const tournamentSnap = await getDoc(doc(db, "tournaments", tournamentId));
+    if (!tournamentSnap.exists()) {
+      showMessage("নির্বাচিত Tournament পাওয়া যায়নি।", true);
+      return;
+    }
+
+    const existing = await getDocs(query(
+      collection(db, "registrations"),
+      where("userId", "==", currentUser.uid),
+      where("tournamentId", "==", tournamentId)
+    ));
+
+    if (!existing.empty) {
+      showMessage("এই Tournament-এ তুমি ইতিমধ্যে আবেদন করেছ।", true);
+      return;
+    }
+
     await addDoc(collection(db, "registrations"), {
       userId: currentUser.uid,
-      tournamentId: f.tournamentId,
-      playerName: f.playerName,
-      uid: f.uid,
-      teamName: f.teamName || "",
+      playerName,
+      uid,
+      teamName,
+      tournamentId,
       status: "pending",
       createdAt: serverTimestamp()
     });
 
-    showMessage("Registration জমা হয়েছে। Admin Approve করলে Join হবে।");
-    e.target.reset();
+    form.reset();
+    showMessage("Registration জমা হয়েছে। Admin Approve করলে Join Confirm হবে।");
     await loadPlayerData();
-
   } catch (error) {
-    showMessage(error.message, true);
+    console.error("Registration submit error:", error);
+    showMessage("Registration হয়নি: " + error.message, true);
   }
 });
 
-// LOAD PLAYER DATA
+// 10) LOAD PLAYER WALLET + MATCHES + PAYMENT HISTORY
 async function loadPlayerData() {
   if (!currentUser) return;
 
@@ -333,240 +410,211 @@ async function loadPlayerData() {
     ));
 
     let balance = 0;
-
-    paymentSnap.forEach(d => {
-      const p = d.data();
-
+    paymentSnap.forEach((item) => {
+      const p = item.data();
       if (p.status === "approved") {
         if (p.type === "deposit") balance += Number(p.amount || 0);
-        else balance -= Number(p.amount || 0);
+        if (p.type === "tournament_fee" || p.type === "withdraw") {
+          balance -= Number(p.amount || 0);
+        }
       }
     });
 
     currentBalance = balance;
+    if ($("#balance")) $("#balance").textContent = "৳ " + money(balance);
 
-    if ($("#balance")) {
-      $("#balance").textContent = "৳" + balance.toFixed(2);
+    if ($("#paymentRows")) {
+      const rows = paymentSnap.docs.map((item) => {
+        const p = item.data();
+        const type = p.type === "deposit" ? "Deposit" :
+          p.type === "tournament_fee" ? "Entry Fee" : escapeHTML(p.type || "");
+        return `<tr>
+          <td>${type}</td>
+          <td>৳${money(p.amount)}</td>
+          <td>${escapeHTML(p.method || "Wallet")}</td>
+          <td>${escapeHTML(p.status || "pending")}</td>
+        </tr>`;
+      }).join("");
+      $("#paymentRows").innerHTML = rows || '<tr><td colspan="4">কোনো লেনদেন নেই।</td></tr>';
     }
 
-    const registrations = await getDocs(query(
+    const registrationSnap = await getDocs(query(
       collection(db, "registrations"),
       where("userId", "==", currentUser.uid)
     ));
 
     if ($("#myMatchesList")) {
-      $("#myMatchesList").innerHTML =
-        registrations.docs.map(d => {
-          const r = d.data();
-
-          return `
-            <div class="match-card">
-              <p>Tournament ID: ${escapeHTML(r.tournamentId)}</p>
-              <p>Player: ${escapeHTML(r.playerName)}</p>
-              <p>Status: ${escapeHTML(r.status)}</p>
-            </div>
-          `;
-        }).join("") || "<p>কোনো Match নেই।</p>";
+      $("#myMatchesList").innerHTML = registrationSnap.docs.map((item) => {
+        const r = item.data();
+        return `<div class="match-card">
+          <p><b>Player:</b> ${escapeHTML(r.playerName || "")}</p>
+          <p><b>Free Fire UID:</b> ${escapeHTML(r.uid || "")}</p>
+          <p><b>Tournament ID:</b> ${escapeHTML(r.tournamentId || "")}</p>
+          <p><b>Status:</b> ${escapeHTML(r.status || "pending")}</p>
+        </div>`;
+      }).join("") || '<div class="empty">এখনো কোনো Registration নেই।</div>';
     }
-
   } catch (error) {
-    console.error("Player data:", error);
+    console.error("Player data load error:", error);
+    showMessage("Wallet/Match তথ্য লোড হয়নি: " + error.message, true);
   }
 }
 
-// ===================================
-// WALLET - DEPOSIT REQUEST
-// ===================================
-
-$("#paymentForm")?.addEventListener("submit", async e => {
+// 11) WALLET — MANUAL DEPOSIT REQUEST ONLY
+$("#paymentForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const form = e.currentTarget;
 
   if (!currentUser) {
-    showMessage("প্রথমে Login করো।", true);
+    showMessage("Deposit Request দিতে Login করো।", true);
+    page("account");
     return;
   }
 
-  const f = Object.fromEntries(new FormData(e.target));
+  const f = Object.fromEntries(new FormData(form));
   const amount = Number(f.amount);
+  const reference = String(f.reference || "").trim();
+  const method = String(f.method || "");
 
   if (f.type !== "deposit") {
-    showMessage("Withdraw এখনো চালু হয়নি।", true);
+    showMessage("Withdraw আপাতত বন্ধ আছে।", true);
     return;
   }
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    showMessage("সঠিক Amount লিখো।", true);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 100000) {
+    showMessage("১ থেকে ১০০,০০০ টাকার মধ্যে Amount দাও।", true);
     return;
   }
-
-  if (!f.reference || !f.method) {
-    showMessage("সব তথ্য পূরণ করো।", true);
+  if (!reference || !["bKash", "Nagad"].includes(method)) {
+    showMessage("সঠিক Transaction ID ও Payment Method দাও।", true);
     return;
   }
 
   try {
     await addDoc(collection(db, "paymentRequests"), {
       userId: currentUser.uid,
-      userEmail: currentUser.email,
+      userEmail: currentUser.email || "",
       type: "deposit",
       amount,
-      method: f.method,
-      reference: f.reference.trim(),
+      method,
+      reference,
       status: "pending",
       createdAt: serverTimestamp()
     });
 
-    showMessage("Deposit Request জমা হয়েছে। Admin যাচাই করবে।");
-    e.target.reset();
+    form.reset();
+    showMessage("Deposit Request জমা হয়েছে। Admin যাচাই করে Approve করবেন।");
     await loadPlayerData();
-
   } catch (error) {
-    showMessage(error.message, true);
+    console.error("Deposit request error:", error);
+    showMessage("Payment Request জমা হয়নি: " + error.message, true);
   }
 });
 
-
-// ===================================
-// ADMIN CHECK
-// ===================================
-
+// 12) ADMIN CHECK — Firestore user document role
 async function checkAdmin() {
-  if (!currentUser) return false;
-
-  const snap = await getDoc(doc(db, "users", currentUser.uid));
-
-  return snap.exists() && snap.data().role === "admin";
+  if (!auth.currentUser) return false;
+  try {
+    const snap = await getDoc(doc(db, "users", auth.currentUser.uid));
+    return snap.exists() && snap.data().role === "admin";
+  } catch (error) {
+    console.error("Admin check error:", error);
+    return false;
+  }
 }
 
-
-// ===================================
-// ADMIN DASHBOARD
-// ===================================
-
+// 13) LOAD ADMIN REQUESTS
 async function loadAdminData() {
   if (!(await checkAdmin())) return;
 
   try {
-    const paymentSnap = await getDocs(query(
-      collection(db, "paymentRequests"),
-      where("status", "==", "pending")
-    ));
+    const [paymentSnap, registrationSnap] = await Promise.all([
+      getDocs(query(
+        collection(db, "paymentRequests"),
+        where("status", "==", "pending")
+      )),
+      getDocs(query(
+        collection(db, "registrations"),
+        where("status", "==", "pending")
+      ))
+    ]);
 
     if ($("#adminPayments")) {
-      $("#adminPayments").innerHTML =
-        paymentSnap.docs.map(d => {
-          const p = d.data();
-
-          return `
-            <div class="admin-card">
-              <p>Type: ${escapeHTML(p.type)}</p>
-              <p>Amount: ৳${Number(p.amount || 0)}</p>
-              <p>Method: ${escapeHTML(p.method || "")}</p>
-              <p>Reference: ${escapeHTML(p.reference || "")}</p>
-              <button type="button" onclick="reviewPayment('${d.id}','approved')">
-                Approve
-              </button>
-              <button type="button" onclick="reviewPayment('${d.id}','rejected')">
-                Reject
-              </button>
-            </div>
-          `;
-        }).join("") || "<p>কোনো Pending Payment নেই।</p>";
+      $("#adminPayments").innerHTML = paymentSnap.docs.map((item) => {
+        const p = item.data();
+        return `<tr>
+          <td>${escapeHTML(p.userEmail || p.userId || "")}</td>
+          <td>${escapeHTML(p.type || "")} • ৳${money(p.amount)} • ${escapeHTML(p.method || "")}<br>ID: ${escapeHTML(p.reference || "")}</td>
+          <td>
+            <button type="button" class="btn primary" onclick="reviewPayment('${item.id}','approved')">Approve</button>
+            <button type="button" class="btn outline" onclick="reviewPayment('${item.id}','rejected')">Reject</button>
+          </td>
+        </tr>`;
+      }).join("") || '<tr><td colspan="3">কোনো Pending Payment নেই।</td></tr>';
     }
-
-    const registrationSnap = await getDocs(query(
-      collection(db, "registrations"),
-      where("status", "==", "pending")
-    ));
 
     if ($("#adminRegistrations")) {
-      $("#adminRegistrations").innerHTML =
-        registrationSnap.docs.map(d => {
-          const r = d.data();
-
-          return `
-            <div class="admin-card">
-              <p>Player: ${escapeHTML(r.playerName)}</p>
-              <p>UID: ${escapeHTML(r.uid)}</p>
-              <p>Team: ${escapeHTML(r.teamName || "")}</p>
-              <p>Tournament: ${escapeHTML(r.tournamentId)}</p>
-              <button type="button" onclick="approveRegistration('${d.id}')">
-                Approve
-              </button>
-              <button type="button" onclick="rejectRegistration('${d.id}')">
-                Reject
-              </button>
-            </div>
-          `;
-        }).join("") || "<p>কোনো Pending Registration নেই।</p>";
+      $("#adminRegistrations").innerHTML = registrationSnap.docs.map((item) => {
+        const r = item.data();
+        return `<tr>
+          <td>${escapeHTML(r.playerName || "")}</td>
+          <td>${escapeHTML(r.uid || "")}</td>
+          <td>${escapeHTML(r.tournamentId || "")}</td>
+          <td>
+            <button type="button" class="btn primary" onclick="approveRegistration('${item.id}')">Approve</button>
+            <button type="button" class="btn outline" onclick="rejectRegistration('${item.id}')">Reject</button>
+          </td>
+        </tr>`;
+      }).join("") || '<tr><td colspan="4">কোনো Pending Registration নেই।</td></tr>';
     }
-
   } catch (error) {
-    console.error("Admin dashboard:", error);
-    showMessage(error.message, true);
+    console.error("Admin dashboard error:", error);
+    showMessage("Admin Data লোড হয়নি: " + error.message, true);
   }
 }
 
+$("#drawerAdmin")?.addEventListener("click", async () => {
+  if (await checkAdmin()) page("admin");
+  else showMessage("শুধু Admin প্রবেশ করতে পারবে।", true);
+});
 
-// ===================================
-// APPROVE / REJECT PAYMENT
-// ===================================
-
-window.reviewPayment = async function(paymentId, status) {
+// 14) ADMIN APPROVE / REJECT DEPOSIT
+window.reviewPayment = async (paymentId, status) => {
   if (!(await checkAdmin())) {
     showMessage("Admin permission নেই।", true);
     return;
   }
-
   if (!["approved", "rejected"].includes(status)) return;
 
   try {
-    const paymentRef = doc(db, "paymentRequests", paymentId);
-    const paymentSnap = await getDoc(paymentRef);
-
-    if (!paymentSnap.exists()) {
-      showMessage("Payment পাওয়া যায়নি।", true);
-      return;
-    }
-
-    const p = paymentSnap.data();
-
-    if (p.status !== "pending") {
-      showMessage("এই Payment আগে Review করা হয়েছে।", true);
-      return;
-    }
-
-    if (p.type !== "deposit") {
-      showMessage("এই Payment Type সমর্থিত নয়।", true);
-      return;
-    }
-
-    await updateDoc(paymentRef, {
-      status,
-      reviewedAt: serverTimestamp(),
-      reviewedBy: currentUser.uid
+    const ref = doc(db, "paymentRequests", paymentId);
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error("Payment পাওয়া যায়নি।");
+      const p = snap.data();
+      if (p.status !== "pending" || p.type !== "deposit") {
+        throw new Error("এই Payment আর Review করা যাবে না।");
+      }
+      tx.update(ref, {
+        status,
+        reviewedAt: serverTimestamp(),
+        reviewedBy: auth.currentUser.uid
+      });
     });
 
-    showMessage(
-      status === "approved"
-        ? "Payment Approve হয়েছে!"
-        : "Payment Reject হয়েছে!"
-    );
-
+    showMessage(status === "approved" ? "Payment Approve হয়েছে।" : "Payment Reject হয়েছে।");
     await loadAdminData();
-    await loadPlayerData();
-
+    if (currentUser) await loadPlayerData();
   } catch (error) {
+    console.error("Review payment error:", error);
     showMessage(error.message, true);
   }
 };
 
-
-// ===================================
-// APPROVE REGISTRATION
-// ===================================
-
-window.approveRegistration = async function(registrationId) {
+// 15) ADMIN APPROVE REGISTRATION + ENTRY FEE LEDGER RECORD
+// NOTE: This browser-side wallet flow is suitable for a demo/manual workflow only.
+// It is not a secure real-money wallet. A trusted server/Cloud Function is needed
+// for production-grade balance enforcement and concurrent approvals.
+window.approveRegistration = async (registrationId) => {
   if (!(await checkAdmin())) {
     showMessage("Admin permission নেই।", true);
     return;
@@ -575,220 +623,204 @@ window.approveRegistration = async function(registrationId) {
   try {
     const registrationRef = doc(db, "registrations", registrationId);
     const registrationSnap = await getDoc(registrationRef);
-
-    if (!registrationSnap.exists()) {
-      showMessage("Registration পাওয়া যায়নি।", true);
-      return;
-    }
+    if (!registrationSnap.exists()) throw new Error("Registration পাওয়া যায়নি।");
 
     const registration = registrationSnap.data();
+    if (registration.status !== "pending") throw new Error("Registration আগে Review হয়েছে।");
 
-    if (registration.status !== "pending") {
-      showMessage("Registration আগে Review করা হয়েছে।", true);
-      return;
-    }
-
-    const tournamentRef = doc(
-      db,
-      "tournaments",
-      registration.tournamentId
-    );
-
+    const tournamentRef = doc(db, "tournaments", registration.tournamentId);
     const tournamentSnap = await getDoc(tournamentRef);
+    if (!tournamentSnap.exists()) throw new Error("Tournament পাওয়া যায়নি।");
 
-    if (!tournamentSnap.exists()) {
-      showMessage("Tournament পাওয়া যায়নি।", true);
-      return;
-    }
+    const fee = Number(tournamentSnap.data().entryFee || 0);
 
-    const tournament = tournamentSnap.data();
-    const fee = Number(tournament.entryFee || 0);
-
-    const paymentsSnap = await getDocs(query(
+    // Read the player's approved ledger entries before starting the transaction.
+    const ledgerSnap = await getDocs(query(
       collection(db, "paymentRequests"),
       where("userId", "==", registration.userId)
     ));
 
     let balance = 0;
-
-    paymentsSnap.forEach(d => {
-      const p = d.data();
-
+    ledgerSnap.forEach((item) => {
+      const p = item.data();
       if (p.status === "approved") {
         if (p.type === "deposit") balance += Number(p.amount || 0);
-        else balance -= Number(p.amount || 0);
+        if (p.type === "tournament_fee" || p.type === "withdraw") {
+          balance -= Number(p.amount || 0);
+        }
       }
     });
 
     if (balance < fee) {
-      showMessage("Player-এর Wallet Balance পর্যাপ্ত নয়।", true);
-      return;
+      throw new Error(`Player-এর Wallet Balance পর্যাপ্ত নয়। বর্তমান Balance: ৳${money(balance)}`);
     }
 
-    await runTransaction(db, async transaction => {
-      const latestRegistration = await transaction.get(registrationRef);
-      const latestTournament = await transaction.get(tournamentRef);
+    await runTransaction(db, async (tx) => {
+      const latestReg = await tx.get(registrationRef);
+      const latestTournament = await tx.get(tournamentRef);
 
-      if (!latestRegistration.exists() || !latestTournament.exists()) {
+      if (!latestReg.exists() || !latestTournament.exists()) {
         throw new Error("Registration অথবা Tournament পাওয়া যায়নি।");
       }
-
-      if (latestRegistration.data().status !== "pending") {
+      if (latestReg.data().status !== "pending") {
         throw new Error("Registration ইতিমধ্যে Review হয়েছে।");
       }
 
-      const latestTournamentData = latestTournament.data();
+      const t = latestTournament.data();
+      const joined = Number(t.joined || 0);
+      const slots = Number(t.slots || 0);
+      if (joined >= slots) throw new Error("Tournament Slot পূর্ণ হয়ে গেছে।");
 
-      if (Number(latestTournamentData.joined || 0) >= Number(latestTournamentData.slots || 0)) {
-        throw new Error("Tournament Slot পূর্ণ হয়ে গেছে।");
-      }
-
-      transaction.update(registrationRef, {
+      tx.update(registrationRef, {
         status: "approved",
         approvedAt: serverTimestamp(),
-        approvedBy: currentUser.uid
+        approvedBy: auth.currentUser.uid
       });
-
-      transaction.update(tournamentRef, {
-        joined: Number(latestTournamentData.joined || 0) + 1
-      });
+      tx.update(tournamentRef, { joined: joined + 1 });
 
       if (fee > 0) {
         const debitRef = doc(collection(db, "paymentRequests"));
-
-        transaction.set(debitRef, {
+        tx.set(debitRef, {
           userId: registration.userId,
           type: "tournament_fee",
           amount: fee,
           status: "approved",
           tournamentId: registration.tournamentId,
+          method: "Wallet",
           reference: "Tournament Entry Fee",
           createdAt: serverTimestamp(),
-          reviewedBy: currentUser.uid
+          reviewedBy: auth.currentUser.uid
         });
       }
     });
 
-    showMessage("Registration Approve হয়েছে!");
+    showMessage("Registration Approve হয়েছে।");
     await loadAdminData();
-    await loadPlayerData();
-
+    if (currentUser) await loadPlayerData();
   } catch (error) {
+    console.error("Approve registration error:", error);
     showMessage(error.message, true);
   }
 };
 
-
-// ===================================
-// REJECT REGISTRATION
-// ===================================
-
-window.rejectRegistration = async function(registrationId) {
+// 16) ADMIN REJECT REGISTRATION
+window.rejectRegistration = async (registrationId) => {
   if (!(await checkAdmin())) {
     showMessage("Admin permission নেই।", true);
     return;
   }
 
   try {
-    await updateDoc(
-      doc(db, "registrations", registrationId),
-      {
+    const ref = doc(db, "registrations", registrationId);
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error("Registration পাওয়া যায়নি।");
+      if (snap.data().status !== "pending") {
+        throw new Error("Registration আগে Review হয়েছে।");
+      }
+      tx.update(ref, {
         status: "rejected",
         reviewedAt: serverTimestamp(),
-        reviewedBy: currentUser.uid
-      }
-    );
+        reviewedBy: auth.currentUser.uid
+      });
+    });
 
-    showMessage("Registration Reject হয়েছে!");
+    showMessage("Registration Reject হয়েছে।");
     await loadAdminData();
-
+    if (currentUser) await loadPlayerData();
   } catch (error) {
+    console.error("Reject registration error:", error);
     showMessage(error.message, true);
   }
 };
 
-
-// ===================================
-// CREATE TOURNAMENT
-// ===================================
-
-$("#createTournament")?.addEventListener("submit", async e => {
+// 17) CREATE TOURNAMENT
+$("#createTournament")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   if (!(await checkAdmin())) {
     showMessage("শুধু Admin Tournament তৈরি করতে পারবে।", true);
     return;
   }
 
-  const f = Object.fromEntries(new FormData(e.target));
+  const form = e.currentTarget;
+  const f = Object.fromEntries(new FormData(form));
+  const entryFee = Number(f.entryFee);
+  const prizePool = Number(f.prizePool);
+  const slots = Number(f.slots);
+
+  if (!String(f.title || "").trim() ||
+      !Number.isFinite(entryFee) || entryFee < 0 ||
+      !Number.isFinite(prizePool) || prizePool < 0 ||
+      !Number.isInteger(slots) || slots < 1 || slots > 500) {
+    showMessage("Tournament-এর তথ্য সঠিকভাবে পূরণ করো।", true);
+    return;
+  }
 
   try {
     await addDoc(collection(db, "tournaments"), {
-      title: f.title,
-      mode: f.mode,
-      description: f.description || "",
-      entryFee: Number(f.entryFee || 0),
-      prizePool: Number(f.prizePool || 0),
-      slots: Number(f.slots || 0),
+      title: String(f.title).trim(),
+      mode: String(f.mode || "Solo"),
+      description: String(f.description || "").trim(),
+      entryFee,
+      prizePool,
+      slots,
       joined: 0,
-      startsAt: f.startsAt
-        ? new Date(f.startsAt).toISOString()
-        : "",
+      startsAt: f.startsAt ? new Date(f.startsAt).toISOString() : "",
       createdAt: serverTimestamp(),
-      createdBy: currentUser.uid
+      createdBy: auth.currentUser.uid
     });
 
-    showMessage("Tournament তৈরি হয়েছে!");
-    e.target.reset();
-
+    form.reset();
+    showMessage("Tournament Publish হয়েছে।");
     await loadTournaments();
     await loadAdminData();
-
   } catch (error) {
+    console.error("Create tournament error:", error);
     showMessage(error.message, true);
   }
 });
 
-
-// ===================================
-// PUBLISH RESULT
-// ===================================
-
-$("#resultForm")?.addEventListener("submit", async e => {
+// 18) PUBLISH RESULT
+$("#resultForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   if (!(await checkAdmin())) {
     showMessage("শুধু Admin Result Publish করতে পারবে।", true);
     return;
   }
 
-  const f = Object.fromEntries(new FormData(e.target));
+  const form = e.currentTarget;
+  const f = Object.fromEntries(new FormData(form));
+  const placement = Number(f.placement);
+  const points = Number(f.points);
+
+  if (!String(f.player || "").trim() ||
+      !String(f.tournamentId || "").trim() ||
+      !Number.isInteger(placement) || placement < 1 ||
+      !Number.isFinite(points) || points < 0) {
+    showMessage("Result-এর তথ্য সঠিকভাবে পূরণ করো।", true);
+    return;
+  }
 
   try {
     await addDoc(collection(db, "results"), {
-      player: f.player,
-      placement: Number(f.placement || 0),
-      points: Number(f.points || 0),
-      tournamentId: f.tournamentId,
+      player: String(f.player).trim(),
+      placement,
+      points,
+      tournamentId: String(f.tournamentId).trim(),
       createdAt: serverTimestamp(),
-      createdBy: currentUser.uid
+      createdBy: auth.currentUser.uid
     });
 
-    showMessage("Result Publish হয়েছে!");
-    e.target.reset();
-
+    form.reset();
+    showMessage("Result Publish হয়েছে।");
     await loadLeaderboard();
-
   } catch (error) {
+    console.error("Publish result error:", error);
     showMessage(error.message, true);
   }
 });
 
-
-// ===================================
-// LEADERBOARD
-// ===================================
-
+// 19) LEADERBOARD
 async function loadLeaderboard() {
   try {
     const snapshot = await getDocs(query(
@@ -797,30 +829,24 @@ async function loadLeaderboard() {
     ));
 
     if ($("#leaderboardRows")) {
-      $("#leaderboardRows").innerHTML =
-        snapshot.docs.map((d, index) => {
-          const r = d.data();
-
-          return `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${escapeHTML(r.player)}</td>
-              <td>${Number(r.placement || 0)}</td>
-              <td>${Number(r.points || 0)}</td>
-            </tr>
-          `;
-        }).join("") || "<tr><td colspan='4'>কোনো Result নেই।</td></tr>";
+      $("#leaderboardRows").innerHTML = snapshot.docs.map((item, index) => {
+        const r = item.data();
+        return `<tr>
+          <td>${index + 1}</td>
+          <td>${escapeHTML(r.player || "")}</td>
+          <td>${Number(r.placement || 0)}</td>
+          <td>${Number(r.points || 0)}</td>
+        </tr>`;
+      }).join("") || '<tr><td colspan="4">এখনো ফলাফল প্রকাশ হয়নি।</td></tr>';
     }
-
   } catch (error) {
-    console.error("Leaderboard:", error);
+    console.error("Leaderboard error:", error);
+    if ($("#leaderboardRows")) {
+      $("#leaderboardRows").innerHTML = '<tr><td colspan="4">Leaderboard লোড হয়নি।</td></tr>';
+    }
   }
 }
 
-
-// ===================================
-// INITIAL LOAD
-// ===================================
-
+// Initial public data
 loadTournaments();
 loadLeaderboard();
