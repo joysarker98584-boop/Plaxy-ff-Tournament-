@@ -7,6 +7,12 @@
 <meta name="theme-color" content="#090d18">
 <title>ArenaX — Free Fire Tournament</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+.profile-editor{display:flex;align-items:center;gap:16px;margin:14px 0 20px;flex-wrap:wrap}
+.profile-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid var(--accent,#25d9a0);background:#182235}
+#profilePhoto{max-width:240px}
+#withdrawForm{display:grid;gap:12px}
+</style>
 </head>
 <body>
 
@@ -187,6 +193,26 @@
       </form>
     </div>
 
+    <div class="panel form-panel">
+      <h3>টাকা উত্তোলন (Withdraw)</h3>
+      <p class="hint">আপনার Wallet-এর available balance থেকে Withdraw request পাঠান। Admin Approve করলে টাকা পাঠানো হবে।</p>
+      <form id="withdrawForm">
+        <label>পরিমাণ (BDT)
+          <input name="amount" type="number" min="1" max="100000" step="1" required>
+        </label>
+        <label>পেমেন্ট মাধ্যম
+          <select name="method" required>
+            <option value="bKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+          </select>
+        </label>
+        <label>যে নম্বরে টাকা নিতে চান
+          <input name="accountNumber" type="tel" inputmode="numeric" pattern="01[3-9][0-9]{8}" maxlength="11" placeholder="01XXXXXXXXX" required>
+        </label>
+        <button class="btn primary" type="submit">Withdraw Request পাঠাও</button>
+      </form>
+    </div>
+
     <div class="panel">
       <h3>লেনদেনের ইতিহাস</h3>
       <div class="table-scroll">
@@ -258,9 +284,24 @@
   </div>
 
   <div id="loggedInPanel" class="panel form-panel" style="display:none">
-    <h3>আপনি সফলভাবে Login করেছেন!</h3>
+    <h3>আমার প্রোফাইল</h3>
+    <div class="profile-editor">
+      <img id="profilePreview" class="profile-avatar" src="https://www.gravatar.com/avatar/?d=mp&s=160" alt="Profile picture">
+      <div>
+        <label>প্রোফাইল ছবি
+          <input id="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp">
+        </label>
+        <small class="hint">JPG, PNG বা WebP • সর্বোচ্চ ৫ MB</small>
+      </div>
+    </div>
+    <form id="profileForm" class="form-grid">
+      <label>Display Name
+        <input id="displayNameInput" name="displayName" maxlength="40" required>
+      </label>
+      <button class="btn primary" type="submit">প্রোফাইল আপডেট</button>
+    </form>
     <p id="session" class="hint">Logged in</p>
-    <button class="btn primary" type="button" id="logout">লগআউট</button>
+    <button class="btn outline" type="button" id="logout">লগআউট</button>
   </div>
 </section>
 
@@ -318,6 +359,16 @@
   </div>
 
   <div class="panel">
+    <h3>Pending Withdraw Requests</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
+        <tbody id="adminWithdrawals"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
     <h3>Pending Registrations</h3>
     <div class="table-scroll">
       <table>
@@ -352,4 +403,5 @@
 <script type="module" src="app.js"></script>
 </body>
   </html>
-  
+
+      
