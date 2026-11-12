@@ -66,6 +66,43 @@ function hideMessage() {
   box.style.display = "none";
 }
 
+// Show or hide the actual login/signup forms based on authentication state.
+function setAuthFormsVisible(visible) {
+  ["#login", "#signup"].forEach((selector) => {
+    const form = $(selector);
+    if (form) form.style.display = visible ? "" : "none";
+  });
+
+  // Header shortcuts are also only visible while logged out.
+  ["#topLogin", "#topSignup"].forEach((selector) => {
+    const button = $(selector);
+    if (!button) return;
+    button.classList.toggle("hide", !visible);
+    button.style.display = visible ? "" : "none";
+  });
+}
+
+// Give the existing message area a polished, consistent notification style.
+(function styleMessageBox() {
+  if (document.getElementById("arenax-message-style")) return;
+  const style = document.createElement("style");
+  style.id = "arenax-message-style";
+  style.textContent = `
+    #message {
+      padding: 12px 16px;
+      margin: 12px 0;
+      border: 1px solid currentColor;
+      border-radius: 12px;
+      background: rgba(15, 20, 35, .94);
+      font-weight: 600;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      overflow-wrap: anywhere;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
 function escapeHTML(value = "") {
   return String(value).replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
@@ -176,7 +213,17 @@ $("#login")?.addEventListener("submit", async (e) => {
     showMessage("Login সফল হয়েছে!");
   } catch (error) {
     console.error("Login error:", error);
-    showMessage(error.message, true);
+    const invalidLoginCodes = [
+      "auth/invalid-credential",
+      "auth/wrong-password",
+      "auth/user-not-found",
+      "auth/invalid-email"
+    ];
+    if (invalidLoginCodes.includes(error.code)) {
+      showMessage("পাসওয়ার্ড বা ইমেল ভুল", true);
+    } else {
+      showMessage("লগইন করা যায়নি। আবার চেষ্টা করো।", true);
+    }
   }
 });
 
@@ -202,6 +249,7 @@ onAuthStateChanged(auth, async (user) => {
 
   try {
     if (user) {
+      setAuthFormsVisible(false);
       const userSnap = await getDoc(doc(db, "users", user.uid));
 
       if (userSnap.exists()) {
@@ -217,14 +265,14 @@ onAuthStateChanged(auth, async (user) => {
         $("#drawerAdmin").style.display = isAdmin ? "block" : "none";
       }
 
-      $("#topLogin")?.classList.add("hide");
-      $("#topSignup")?.classList.add("hide");
+      setAuthFormsVisible(false);
 
       await loadTournaments();
       await loadPlayerData();
       await loadLeaderboard();
       if (isAdmin) await loadAdminData();
     } else {
+      setAuthFormsVisible(true);
       if ($("#session")) $("#session").textContent = "Login করা হয়নি";
       if ($("#logout")) $("#logout").style.display = "none";
       if ($("#drawerAdmin")) {
