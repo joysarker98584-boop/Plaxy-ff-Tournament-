@@ -289,6 +289,27 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // TOURNAMENT CARD
+
+function formatTournamentDate(value) {
+  if (!value) return "সময় নির্ধারণ করা হয়নি";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "সময় নির্ধারণ করা হয়নি";
+  }
+
+  return date.toLocaleString("bn-BD", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Dhaka"
+  });
+}
+
 function tournamentCard(item) {
   const t = item.data;
   const id = item.id;
@@ -298,18 +319,40 @@ function tournamentCard(item) {
 
   return `
     <article class="tournament-card">
+
       <div class="tournament-card-top">
         <span class="mode-tag">${escapeHTML(t.mode || "Solo")}</span>
         <span class="live-tag">${full ? "SLOT FULL" : "OPEN"}</span>
       </div>
 
       <h3>${escapeHTML(t.title || "ArenaX Tournament")}</h3>
+
       <p>${escapeHTML(t.description || "Join the battle and win prizes.")}</p>
 
+      <div class="tournament-start-time">
+        <span class="start-time-icon">🕒</span>
+        <div>
+          <small>TOURNAMENT START TIME</small>
+          <strong>${escapeHTML(formatTournamentDate(t.startsAt))}</strong>
+          <span>বাংলাদেশ সময় (BDT)</span>
+        </div>
+      </div>
+
       <div class="tournament-info">
-        <div><small>ENTRY FEE</small><b>৳${money(t.entryFee)}</b></div>
-        <div><small>PRIZE POOL</small><b>৳${money(t.prizePool)}</b></div>
-        <div><small>PLAYERS</small><b>${joined}/${slots}</b></div>
+        <div>
+          <small>ENTRY FEE</small>
+          <b>৳${money(t.entryFee)}</b>
+        </div>
+
+        <div>
+          <small>PRIZE POOL</small>
+          <b>৳${money(t.prizePool)}</b>
+        </div>
+
+        <div>
+          <small>PLAYERS</small>
+          <b>${joined}/${slots}</b>
+        </div>
       </div>
 
       <div class="slot-track">
@@ -323,9 +366,11 @@ function tournamentCard(item) {
         onclick="window.openJoinForm('${escapeHTML(id)}')">
         ${full ? "Slot পূর্ণ" : "🏆 Join Tournament"}
       </button>
+
     </article>
   `;
 }
+
 
 // LOAD TOURNAMENTS
 async function loadTournaments() {
