@@ -10,6 +10,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
+
+import {
   getFirestore,
   collection,
   doc,
@@ -39,6 +46,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 let currentUser = null;
 let isAdmin = false;
@@ -256,6 +264,8 @@ onAuthStateChanged(auth, async (user) => {
       $("#session").textContent =
         `Login করা হয়েছে: ${user.displayName || user.email}`;
     }
+    if ($("#displayNameInput")) $("#displayNameInput").value = user.displayName || "";
+    if ($("#profilePreview")) $("#profilePreview").src = user.photoURL || "https://www.gravatar.com/avatar/?d=mp&s=160";
 
     $("#drawerAdmin")?.classList.toggle("hide", !admin);
     $("#page-admin")?.classList.toggle("admin-enabled", admin);
@@ -288,7 +298,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// TOURNAMENT CARD
+                // TOURNAMENT CARD
 
 function formatTournamentDate(value) {
   if (!value) return "সময় নির্ধারণ করা হয়নি";
@@ -546,8 +556,16 @@ async function loadPlayerData() {
       }
     });
 
+    // Pending withdrawal requests reserve funds until Admin rejects or approves.
+    paymentSnap.forEach((item) => {
+      const p = item.data();
+      if (p.type === "withdraw" && p.status === "pending") {
+        balance -= Number(p.amount || 0);
+      }
+    });
+
     if ($("#balance")) {
-      $("#balance").textContent = "৳ " + money(balance);
+      $("#balance").textContent = "৳ " + money(Math.max(0, balance));
     }
 
     if ($("#paymentRows")) {
@@ -632,6 +650,109 @@ $("#paymentForm")?.addEventListener("submit", async (event) => {
   }
 });
 
+// WITHDRAW REQUEST
+$("#withdrawForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser) {
+    showMessage("Withdraw করতে আগে Login করো।", true);
+    page("account");
+    return;
+  }
+
+  const form = event.currentTarget;
+  const data = Object.fromEntries(new FormData(form));
+  const amount = Number(data.amount);
+  const accountNumber = String(data.accountNumber || "").trim();
+
+  if (!Number.isFinite(amount) || amount < 1 || amount > 100000 ||
+      !/^01[3-9][0-9]{8}$/.test(accountNumber)) {
+    showMessage("সঠিক Amount ও ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দাও।", true);
+    return;
+  }
+
+  try {
+    const ledger = await getDocs(query(
+      collection(db, "paymentRequests"),
+      where("userId", "==", currentUser.uid)
+    ));
+    let available = 0;
+    ledger.forEach((item) => {
+      const p = item.data();
+      if (p.status === "approved") {
+        if (p.type === "deposit") available += Number(p.amount || 0);
+        if (p.type === "withdraw" || p.type === "tournament_fee") available -= Number(p.amount || 0);
+      } else if (p.type === "withdraw" && p.status === "pending") {
+        available -= Number(p.amount || 0);
+      }
+    });
+    if (amount > available) throw new Error(`পর্যাপ্ত ব্যালেন্স নেই। Available: ৳${money(Math.max(0, available))}`);
+
+    await addDoc(collection(db, "paymentRequests"), {
+      userId: currentUser.uid,
+      type: "withdraw",
+      amount,
+      method: String(data.method),
+      accountNumber,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+    form.reset();
+    showMessage("Withdraw request পাঠানো হয়েছে। Admin Review করবেন।");
+    await loadPlayerData();
+    if (isAdmin) await loadAdminData();
+  } catch (error) {
+    console.error("Withdraw request error:", error);
+    showMessage(error.message || "Withdraw request পাঠানো যায়নি।", true);
+  }
+});
+
+// PROFILE PHOTO + DISPLAY NAME
+$("#profilePhoto")?.addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  if (!file || !currentUser) return;
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    showMessage("JPG, PNG বা WebP ছবি দিন; সর্বোচ্চ ৫ MB।", true);
+    event.target.value = "";
+    return;
+  }
+  try {
+    const path = `profilePhotos/${currentUser.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+    const imageRef = storageRef(storage, path);
+    await uploadBytes(imageRef, file, { contentType: file.type });
+    const photoURL = await getDownloadURL(imageRef);
+    await updateProfile(currentUser, { photoURL });
+    await setDoc(doc(db, "users", currentUser.uid), {
+      photoURL, updatedAt: serverTimestamp()
+    }, { merge: true });
+    if ($("#profilePreview")) $("#profilePreview").src = photoURL;
+    showMessage("প্রোফাইল ছবি আপডেট হয়েছে।");
+  } catch (error) {
+    console.error("Profile photo error:", error);
+    showMessage("ছবি আপলোড হয়নি। Firebase Storage Rules চেক করো।", true);
+  }
+});
+
+$("#profileForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser) return;
+  const displayName = String(new FormData(event.currentTarget).get("displayName") || "").trim();
+  if (!displayName || displayName.length > 40) {
+    showMessage("Display Name ১-৪০ অক্ষরের মধ্যে দাও।", true);
+    return;
+  }
+  try {
+    await updateProfile(currentUser, { displayName });
+    await setDoc(doc(db, "users", currentUser.uid), {
+      displayName, updatedAt: serverTimestamp()
+    }, { merge: true });
+    if ($("#session")) $("#session").textContent = `Login করা হয়েছে: ${displayName}`;
+    showMessage("Display Name আপডেট হয়েছে।");
+  } catch (error) {
+    console.error("Profile update error:", error);
+    showMessage(error.message || "Profile আপডেট হয়নি।", true);
+  }
+});
+
 // LOAD ADMIN DATA
 async function loadAdminData() {
   if (!(await checkAdmin())) return;
@@ -662,6 +783,29 @@ async function loadAdminData() {
                 </td>
               </tr>
             `;
+          }).join("");
+    }
+
+    const withdrawalSnap = await getDocs(query(
+      collection(db, "paymentRequests"),
+      where("type", "==", "withdraw"),
+      where("status", "==", "pending")
+    ));
+
+    if ($("#adminWithdrawals")) {
+      $("#adminWithdrawals").innerHTML = withdrawalSnap.empty
+        ? '<tr><td colspan="3">কোনো Pending Withdraw নেই।</td></tr>'
+        : withdrawalSnap.docs.map((item) => {
+            const w = item.data();
+            return `
+              <tr>
+                <td>${escapeHTML(w.userId)}</td>
+                <td>৳${money(w.amount)}<br>${escapeHTML(w.method || "")}<br>${escapeHTML(w.accountNumber || "")}</td>
+                <td>
+                  <button class="small-btn approve" onclick="window.reviewPayment('${item.id}','approved')">Approve</button>
+                  <button class="small-btn reject" onclick="window.reviewPayment('${item.id}','rejected')">Reject</button>
+                </td>
+              </tr>`;
           }).join("");
     }
 
@@ -716,6 +860,28 @@ window.reviewPayment = async (paymentId, status) => {
         throw new Error("Payment আগে Review করা হয়েছে।");
       }
 
+      const request = snap.data();
+      if (request.type === "withdraw" && status === "approved") {
+        const userPayments = await getDocs(query(
+          collection(db, "paymentRequests"),
+          where("userId", "==", request.userId)
+        ));
+        let available = 0;
+        userPayments.forEach((entry) => {
+          if (entry.id === paymentId) return;
+          const p = entry.data();
+          if (p.status === "approved") {
+            if (p.type === "deposit") available += Number(p.amount || 0);
+            if (p.type === "withdraw" || p.type === "tournament_fee") available -= Number(p.amount || 0);
+          } else if (p.type === "withdraw" && p.status === "pending") {
+            available -= Number(p.amount || 0);
+          }
+        });
+        if (Number(request.amount || 0) > available) {
+          throw new Error("এই Withdraw Approve করার মতো পর্যাপ্ত Available Balance নেই।");
+        }
+      }
+
       tx.update(ref, {
         status,
         reviewedAt: serverTimestamp(),
@@ -732,7 +898,7 @@ window.reviewPayment = async (paymentId, status) => {
     await loadAdminData();
     if (currentUser) await loadPlayerData();
   } catch (error) {
-    console.error("Review payment error:", error);
+          console.error("Review payment error:", error);
     showMessage(error.message, true);
   }
 };
@@ -1016,3 +1182,4 @@ async function loadLeaderboard() {
 // INITIAL PUBLIC DATA
 loadTournaments();
 loadLeaderboard();
+      
