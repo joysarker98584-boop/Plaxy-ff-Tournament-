@@ -1,19 +1,24 @@
+
 <!doctype html>
 <html lang="bn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b0e16">
+<meta name="theme-color" content="#090d18">
 <title>ArenaX — Free Fire Tournament</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 <header class="topbar">
-  <button class="menu-btn" id="menuToggle" aria-label="Menu">☰</button>
-  <a class="brand" href="#" data-page="home">ARENA<span>X</span><small>FREE FIRE TOURNAMENT</small></a>
+  <button class="menu-btn" id="menuToggle">☰</button>
+  <a class="brand" href="#" data-page="home">
+    ARENA<span>X</span>
+    <small>FREE FIRE TOURNAMENT</small>
+  </a>
   <div class="top-actions">
-    <button class="btn outline" data-page="account" id="topLogin">লগইন</button>
-    <button class="btn primary" data-page="account" id="topSignup">সাইন আপ</button>
+    <button class="btn outline" id="topLogin" data-page="account">লগইন</button>
+    <button class="btn primary" id="topSignup" data-page="account">সাইন আপ</button>
   </div>
 </header>
 
@@ -25,112 +30,314 @@
   <button data-page="myMatches">🎮　আমার ম্যাচ</button>
   <button data-page="wallet">▣　ওয়ালেট</button>
   <button data-page="leaderboard">🥇　লিডারবোর্ড</button>
-  <button data-page="account">♙　লগইন / রেজিস্টার</button>
+  <button data-page="account">♙　অ্যাকাউন্ট</button>
   <button data-page="contact">☎　যোগাযোগ</button>
   <button data-page="admin" id="drawerAdmin" class="hide">⚙　Admin Panel</button>
 </aside>
 <div class="scrim" id="scrim"></div>
 
 <main class="container">
-  <div id="message" class="toast hide" role="status"></div>
+<div id="message" class="toast hide" role="status"></div>
 
-  <section class="page active" id="page-home">
-    <div class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</div>
-        <h1>RULE THE<br><span>BATTLEGROUND.</span></h1>
-        <p>Solo, Duo ও Squad ম্যাচে অংশ নাও। নিজের স্কিল দেখাও, জিতো পুরস্কার।</p>
-        <div class="hero-actions"><button class="btn primary" data-page="tournaments">টুর্নামেন্ট দেখো　→</button><button class="btn outline" data-page="account">এখনই Join করো</button></div>
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</div>
+      <h1>RULE THE<br><span>BATTLEGROUND.</span></h1>
+      <p>Solo, Duo ও Squad ম্যাচে অংশ নাও। নিজের স্কিল দেখাও, জিতো পুরস্কার।</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-page="tournaments">টুর্নামেন্ট দেখো →</button>
+        <button class="btn outline" data-page="account">এখনই Join করো</button>
       </div>
-      <div class="hero-emblem"><div class="ring">♛</div><b>ARENA X</b><small>CHAMPIONS ARE MADE HERE</small></div>
     </div>
-    <div class="stats">
-      <div class="stat"><b>SOLO • DUO • SQUAD</b><small>একাধিক ম্যাচ মোড</small></div>
-      <div class="stat"><b>৳ BDT</b><small>bKash ও Nagad পেমেন্ট</small></div>
-      <div class="stat"><b>24/7</b><small>কমিউনিটি সাপোর্ট</small></div>
+    <div class="hero-emblem">
+      <div class="ring">♛</div>
+      <b>ARENA X</b>
+      <small>CHAMPIONS ARE MADE HERE</small>
     </div>
-    <div class="section-head"><div><div class="eyebrow">PLAY & WIN</div><h2>চলমান টুর্নামেন্ট</h2></div><button class="text-btn" data-page="tournaments">সব দেখো →</button></div>
-    <div id="homeTournamentList" class="tournament-grid"><div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div></div>
-    <div class="contact-strip"><div><b>সাহায্য লাগবে?</b><small>আমাদের সাথে যোগাযোগ করো</small></div><a class="btn primary" href="tel:01346022330">কল করো: 01346022330</a></div>
-  </section>
+  </div>
 
-  <section class="page" id="page-tournaments">
-    <div class="page-heading"><div class="eyebrow">FIND YOUR MATCH</div><h2>সব টুর্নামেন্ট</h2><p>পছন্দের ম্যাচ বেছে রেজিস্ট্রেশন করো।</p></div>
-    <div id="tournamentList" class="tournament-grid"><div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div></div>
-  </section>
+  <div class="stats">
+    <div class="stat"><b>SOLO • DUO • SQUAD</b><small>একাধিক ম্যাচ মোড</small></div>
+    <div class="stat"><b>৳ BDT</b><small>bKash ও Nagad</small></div>
+    <div class="stat"><b>24/7</b><small>কমিউনিটি সাপোর্ট</small></div>
+  </div>
 
-  <section class="page" id="page-myMatches">
-    <div class="page-heading"><div class="eyebrow">PLAYER ZONE</div><h2>আমার ম্যাচ</h2><p>তোমার রেজিস্ট্রেশন ও ম্যাচের তথ্য।</p></div>
-    <div class="panel"><div id="myMatchesList" class="empty">ম্যাচ দেখতে Login করো।</div></div>
+  <div class="section-head">
+    <div><div class="eyebrow">PLAY & WIN</div><h2>চলমান টুর্নামেন্ট</h2></div>
+    <button class="text-btn" data-page="tournaments">সব দেখো →</button>
+  </div>
+  <div id="homeTournamentList" class="tournament-grid">
+    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
+  </div>
+
+  <div class="contact-strip">
+    <div><b>সাহায্য লাগবে?</b><small>আমাদের সাথে যোগাযোগ করো</small></div>
+    <a class="btn primary" href="tel:01346022330">কল করো: 01346022330</a>
+  </div>
+</section>
+
+<!-- TOURNAMENTS -->
+<section class="page" id="page-tournaments">
+  <div class="page-heading">
+    <div class="eyebrow">FIND YOUR MATCH</div>
+    <h2>সব টুর্নামেন্ট</h2>
+    <p>পছন্দের ম্যাচ বেছে রেজিস্ট্রেশন করো।</p>
+  </div>
+  <div id="tournamentList" class="tournament-grid">
+    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
+  </div>
+</section>
+
+<!-- MY MATCHES + JOIN -->
+<section class="page" id="page-myMatches">
+  <div class="page-heading">
+    <div class="eyebrow">PLAYER ZONE</div>
+    <h2>আমার ম্যাচ</h2>
+    <p>তোমার রেজিস্ট্রেশন ও ম্যাচের তথ্য।</p>
+  </div>
+
+  <div class="panel">
+    <div id="myMatchesList" class="empty">ম্যাচ দেখতে Login করো।</div>
+  </div>
+
+  <div class="panel form-panel join-panel">
+    <div class="join-heading">
+      <div>
+        <div class="eyebrow">ENTER THE BATTLE</div>
+        <h3>টুর্নামেন্টে Join করো</h3>
+        <p>সঠিক Game তথ্য দিয়ে রেজিস্ট্রেশন সম্পন্ন করো।</p>
+      </div>
+      <div class="join-icon">🏆</div>
+    </div>
+
+    <form id="registrationForm" class="form-grid">
+      <label>টুর্নামেন্ট বেছে নাও
+        <select name="tournamentId" id="tournamentSelect" required>
+          <option value="">টুর্নামেন্ট বেছে নাও</option>
+        </select>
+      </label>
+
+      <label>Player / Team Name
+        <input name="playerName" maxlength="40" placeholder="তোমার নাম বা Team Name" required>
+      </label>
+
+      <label>Game Username
+        <input name="gameUsername" maxlength="40" placeholder="Free Fire-এর In-game নাম" required>
+      </label>
+
+      <label>Free Fire UID
+        <input name="uid" inputmode="numeric" pattern="[0-9]{5,20}" placeholder="তোমার Free Fire UID" required>
+      </label>
+
+      <label>Team Name (Duo / Squad)
+        <input name="teamName" maxlength="40" placeholder="Team Name (ঐচ্ছিক)">
+      </label>
+
+      <div class="join-note">
+        <b>⚠️ গুরুত্বপূর্ণ</b>
+        <p>Game Username ও UID সঠিকভাবে লিখবে। ভুল তথ্য দিলে ম্যাচে অংশ নিতে সমস্যা হতে পারে।</p>
+      </div>
+
+      <button class="btn primary join-submit" type="submit">🏆 রেজিস্ট্রেশন পাঠাও</button>
+    </form>
+  </div>
+</section>
+
+<!-- WALLET -->
+<section class="page" id="page-wallet">
+  <div class="page-heading">
+    <div class="eyebrow">PLAYER FUNDS</div>
+    <h2>আমার ওয়ালেট</h2>
+    <p>টাকা পাঠানোর পর Transaction ID জমা দাও।</p>
+  </div>
+
+  <div class="wallet-balance">
+    <small>অনুমোদিত আনুমানিক ব্যালেন্স</small>
+    <strong id="balance">৳ 0.00</strong>
+    <span>Admin যাচাই করার পর ব্যালেন্স আপডেট হবে</span>
+  </div>
+
+  <div class="cols">
     <div class="panel form-panel">
-      <h3>ম্যাচে রেজিস্ট্রেশন</h3>
-      <form id="registrationForm" class="form-grid">
-        <label>টুর্নামেন্ট<select name="tournamentId" id="tournamentSelect" required><option value="">টুর্নামেন্ট বেছে নাও</option></select></label>
-        <label>Player / Team Name<input name="playerName" maxlength="40" required></label>
-        <label>Free Fire UID<input name="uid" inputmode="numeric" pattern="[0-9]{5,20}" required></label>
-        <label>Team Name (Duo / Squad)<input name="teamName" maxlength="40"></label>
-        <button class="btn primary" type="submit">রেজিস্ট্রেশন পাঠাও</button>
-      </form>
-    </div>
-  </section>
-
-  <section class="page" id="page-wallet">
-    <div class="page-heading"><div class="eyebrow">PLAYER FUNDS</div><h2>আমার ওয়ালেট</h2><p>টাকা পাঠানোর পর Transaction ID জমা দাও।</p></div>
-    <div class="wallet-balance"><small>অনুমোদিত আনুমানিক ব্যালেন্স</small><strong id="balance">৳ 0.00</strong><span>Admin যাচাই করার পর ব্যালেন্স আপডেট হবে</span></div>
-    <div class="cols">
-      <div class="panel form-panel">
-        <h3>টাকা জমা / উত্তোলন</h3>
-        <div class="pay-number"><small>আমাদের bKash / Nagad নম্বর</small><strong>01346022330</strong><button class="copy-btn" id="copyNumber">নম্বর কপি</button></div>
-        <p class="hint">Send Money করার পর নিচের ফর্মে Transaction ID দাও। PIN বা OTP কখনো দেবে না।</p>
-        <form id="paymentForm">
-          <label>রিকোয়েস্ট টাইপ<select name="type"><option value="deposit">টাকা জমা (Deposit)</option><option value="withdraw">টাকা উত্তোলন (Withdraw)</option></select></label>
-          <label>পরিমাণ (BDT)<input name="amount" type="number" min="1" max="100000" step="1" required></label>
-          <label>পেমেন্ট মাধ্যম<select name="method"><option>bKash</option><option>Nagad</option></select></label>
-          <label>Transaction ID / উত্তোলনের নম্বর<input name="reference" minlength="4" maxlength="100" required></label>
-          <button class="btn primary" type="submit">রিকোয়েস্ট পাঠাও</button>
-        </form>
+      <h3>টাকা জমা (Deposit)</h3>
+      <div class="pay-number">
+        <small>আমাদের bKash / Nagad নম্বর</small>
+        <strong>01346022330</strong>
+        <button class="copy-btn" id="copyNumber" type="button">নম্বর কপি</button>
       </div>
-      <div class="panel"><h3>লেনদেনের ইতিহাস</h3><div class="table-scroll"><table><thead><tr><th>ধরন</th><th>টাকা</th><th>মাধ্যম</th><th>অবস্থা</th></tr></thead><tbody id="paymentRows"><tr><td colspan="4">Login করলে দেখা যাবে।</td></tr></tbody></table></div></div>
-    </div>
-    <div class="notice">গুরুত্বপূর্ণ: এই ওয়েবসাইটে bKash/Nagad-এর Manual Send Money verification ব্যবহৃত হচ্ছে। টাকা স্বয়ংক্রিয়ভাবে যোগ হবে না; Admin যাচাই করে Approve করবেন।</div>
-  </section>
+      <p class="hint">Send Money করার পর Transaction ID দাও। PIN বা OTP কখনো দেবে না।</p>
 
-  <section class="page" id="page-leaderboard">
-    <div class="page-heading"><div class="eyebrow">TOP PLAYERS</div><h2>লিডারবোর্ড</h2><p>সেরা খেলোয়াড়দের তালিকা।</p></div>
-    <div class="panel table-scroll"><table><thead><tr><th>র‍্যাংক</th><th>প্লেয়ার</th><th>পজিশন</th><th>পয়েন্ট</th></tr></thead><tbody id="leaderboardRows"><tr><td colspan="4">এখনো ফলাফল প্রকাশ হয়নি।</td></tr></tbody></table></div>
-  </section>
-
-  <section class="page" id="page-account">
-    <div class="page-heading"><div class="eyebrow">PLAYER ACCESS</div><h2>অ্যাকাউন্ট</h2><p>নতুন অ্যাকাউন্ট খোলো অথবা Login করো।</p></div>
-    <div class="cols">
-      <form id="signup" class="panel form-panel"><h3>নতুন অ্যাকাউন্ট</h3><label>তোমার নাম<input name="name" maxlength="40" required></label><label>Email<input name="email" type="email" required></label><label>Password (কমপক্ষে ৬ অক্ষর)<input name="password" type="password" minlength="6" required></label><button class="btn primary">সাইন আপ</button></form>
-      <form id="login" class="panel form-panel"><h3>Welcome Back</h3><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button class="btn primary">লগইন</button><button class="btn outline" type="button" id="logout">লগআউট</button><p id="session" class="hint">Login করা হয়নি</p></form>
-    </div>
-  </section>
-
-  <section class="page" id="page-contact">
-    <div class="page-heading"><div class="eyebrow">WE ARE HERE TO HELP</div><h2>যোগাযোগ</h2><p>টুর্নামেন্ট, পেমেন্ট বা অ্যাকাউন্ট সংক্রান্ত সাহায্যের জন্য যোগাযোগ করো।</p></div>
-    <div class="panel contact-card"><div class="contact-icon">☎</div><h3>ArenaX Support</h3><strong>01346022330</strong><p>কল অথবা WhatsApp-এ যোগাযোগ করতে পারো।</p><div class="hero-actions"><a class="btn primary" href="tel:01346022330">Call Now</a><a class="btn outline" href="https://wa.me/8801346022330" target="_blank" rel="noopener">WhatsApp</a></div></div>
-  </section>
-
-  <section class="page" id="page-admin">
-    <div class="page-heading"><div class="eyebrow">CONTROL CENTER</div><h2>Admin Panel</h2><p>শুধু অনুমোদিত Admin এই অংশ ব্যবহার করতে পারবেন।</p></div>
-    <div class="panel form-panel"><h3>নতুন টুর্নামেন্ট তৈরি</h3>
-      <form id="createTournament" class="form-grid">
-        <label>টুর্নামেন্টের নাম<input name="title" maxlength="100" required></label>
-        <label>মোড<select name="mode"><option>Solo</option><option>Duo</option><option>Squad</option></select></label>
-        <label>বর্ণনা<input name="description" maxlength="400"></label>
-        <label>Entry Fee (৳)<input name="entryFee" type="number" min="0" required></label>
-        <label>Prize Pool (৳)<input name="prizePool" type="number" min="0" required></label>
-        <label>সর্বোচ্চ Slot<input name="slots" type="number" min="1" max="500" value="48" required></label>
-        <label>ম্যাচের সময়<input name="startsAt" type="datetime-local"></label>
-        <button class="btn primary">টুর্নামেন্ট Publish</button>
+      <form id="paymentForm">
+        <input type="hidden" name="type" value="deposit">
+        <label>পরিমাণ (BDT)
+          <input name="amount" type="number" min="1" max="100000" step="1" required>
+        </label>
+        <label>পেমেন্ট মাধ্যম
+          <select name="method">
+            <option value="bKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+          </select>
+        </label>
+        <label>Transaction ID
+          <input name="reference" minlength="4" maxlength="100" required>
+        </label>
+        <button class="btn primary" type="submit">Deposit Request পাঠাও</button>
       </form>
     </div>
-    <div class="panel"><h3>Pending Payment Requests</h3><div class="table-scroll"><table><thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead><tbody id="adminPayments"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody></table></div></div>
-    <div class="panel"><h3>Pending Registrations</h3><div class="table-scroll"><table><thead><tr><th>প্লেয়ার</th><th>UID</th><th>টুর্নামেন্ট</th><th>অ্যাকশন</th></tr></thead><tbody id="adminRegistrations"><tr><td colspan="4">Admin access প্রয়োজন।</td></tr></tbody></table></div></div>
-    <div class="panel form-panel"><h3>ফলাফল Publish</h3><form id="resultForm" class="form-grid"><label>Player Name<input name="player" required></label><label>Placement<input name="placement" type="number" min="1" required></label><label>Points<input name="points" type="number" min="0" required></label><label>Tournament ID<input name="tournamentId" required></label><button class="btn primary">ফলাফল Publish</button></form></div>
-  </section>
+
+    <div class="panel">
+      <h3>লেনদেনের ইতিহাস</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>ধরন</th><th>টাকা</th><th>মাধ্যম</th><th>অবস্থা</th></tr></thead>
+          <tbody id="paymentRows">
+            <tr><td colspan="4">Login করলে দেখা যাবে।</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice">
+    গুরুত্বপূর্ণ: এটি Manual bKash/Nagad verification। Admin যাচাই করে Approve করলে ব্যালেন্স আপডেট হবে।
+  </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section class="page" id="page-leaderboard">
+  <div class="page-heading">
+    <div class="eyebrow">TOP PLAYERS</div>
+    <h2>লিডারবোর্ড</h2>
+    <p>সেরা খেলোয়াড়দের তালিকা।</p>
+  </div>
+  <div class="panel table-scroll">
+    <table>
+      <thead><tr><th>র‍্যাংক</th><th>প্লেয়ার</th><th>পজিশন</th><th>পয়েন্ট</th></tr></thead>
+      <tbody id="leaderboardRows">
+        <tr><td colspan="4">এখনো ফলাফল প্রকাশ হয়নি।</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ACCOUNT -->
+<section class="page" id="page-account">
+  <div class="page-heading">
+    <div class="eyebrow">PLAYER ACCESS</div>
+    <h2>অ্যাকাউন্ট</h2>
+    <p>নতুন অ্যাকাউন্ট খোলো অথবা Login করো।</p>
+  </div>
+
+  <div class="cols">
+    <form id="signup" class="panel form-panel">
+      <h3>নতুন অ্যাকাউন্ট</h3>
+      <label>তোমার নাম
+        <input name="name" maxlength="40" required>
+      </label>
+      <label>Email
+        <input name="email" type="email" required>
+      </label>
+      <label>Password (কমপক্ষে ৬ অক্ষর)
+        <input name="password" type="password" minlength="6" required>
+      </label>
+      <button class="btn primary" type="submit">সাইন আপ</button>
+    </form>
+
+    <form id="login" class="panel form-panel">
+      <h3>Welcome Back</h3>
+      <label>Email
+        <input name="email" type="email" required>
+      </label>
+      <label>Password
+        <input name="password" type="password" required>
+      </label>
+      <button class="btn primary" type="submit">লগইন</button>
+    </form>
+  </div>
+
+  <div id="loggedInPanel" class="panel form-panel" style="display:none">
+    <h3>আপনি সফলভাবে Login করেছেন!</h3>
+    <p id="session" class="hint">Logged in</p>
+    <button class="btn primary" type="button" id="logout">লগআউট</button>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="page" id="page-contact">
+  <div class="page-heading">
+    <div class="eyebrow">WE ARE HERE TO HELP</div>
+    <h2>যোগাযোগ</h2>
+    <p>সাহায্যের জন্য যোগাযোগ করো।</p>
+  </div>
+  <div class="panel contact-card">
+    <div class="contact-icon">☎</div>
+    <h3>ArenaX Support</h3>
+    <strong>01346022330</strong>
+    <p>কল অথবা WhatsApp-এ যোগাযোগ করতে পারো।</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="tel:01346022330">Call Now</a>
+      <a class="btn outline" href="https://wa.me/8801346022330" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="page" id="page-admin">
+  <div class="page-heading">
+    <div class="eyebrow">CONTROL CENTER</div>
+    <h2>Admin Panel</h2>
+    <p>শুধু অনুমোদিত Admin এই অংশ ব্যবহার করতে পারবেন।</p>
+  </div>
+
+  <div class="panel form-panel">
+    <h3>নতুন টুর্নামেন্ট তৈরি</h3>
+    <form id="createTournament" class="form-grid">
+      <label>টুর্নামেন্টের নাম<input name="title" maxlength="100" required></label>
+      <label>মোড
+        <select name="mode"><option>Solo</option><option>Duo</option><option>Squad</option></select>
+      </label>
+      <label>বর্ণনা<input name="description" maxlength="400"></label>
+      <label>Entry Fee (৳)<input name="entryFee" type="number" min="0" required></label>
+      <label>Prize Pool (৳)<input name="prizePool" type="number" min="0" required></label>
+      <label>সর্বোচ্চ Slot<input name="slots" type="number" min="1" max="500" value="48" required></label>
+      <label>ম্যাচের সময়<input name="startsAt" type="datetime-local"></label>
+      <button class="btn primary" type="submit">টুর্নামেন্ট Publish</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Pending Payment Requests</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
+        <tbody id="adminPayments"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Pending Registrations</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>প্লেয়ার</th><th>Game Username</th><th>UID</th><th>টুর্নামেন্ট</th><th>অ্যাকশন</th></tr></thead>
+        <tbody id="adminRegistrations"><tr><td colspan="5">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel form-panel">
+    <h3>ফলাফল Publish</h3>
+    <form id="resultForm" class="form-grid">
+      <label>Player Name<input name="player" required></label>
+      <label>Placement<input name="placement" type="number" min="1" required></label>
+      <label>Points<input name="points" type="number" min="0" required></label>
+      <label>Tournament ID<input name="tournamentId" required></label>
+      <button class="btn primary" type="submit">ফলাফল Publish</button>
+    </form>
+  </div>
+</section>
 </main>
 
 <nav class="bottom-nav">
@@ -140,6 +347,9 @@
   <button data-page="wallet"><span>▣</span>ওয়ালেট</button>
   <button data-page="account"><span>♙</span>অ্যাকাউন্ট</button>
 </nav>
+
 <footer>© 2026 ArenaX • Independent community tournament platform. Not affiliated with Garena / Free Fire.</footer>
 <script type="module" src="app.js"></script>
-</body></html>
+</body>
+  </html>
+  
