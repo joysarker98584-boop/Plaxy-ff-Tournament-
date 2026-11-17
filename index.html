@@ -1,407 +1,815 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090d18">
-<title>ArenaX — Free Fire Tournament</title>
-<link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jannat Outfit's | Online Fashion Store</title>
+
 <style>
-.profile-editor{display:flex;align-items:center;gap:16px;margin:14px 0 20px;flex-wrap:wrap}
-.profile-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid var(--accent,#25d9a0);background:#182235}
-#profilePhoto{max-width:240px}
-#withdrawForm{display:grid;gap:12px}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fff9f7;
+  color: #3d2630;
+}
+
+header {
+  background: #fff;
+  padding: 15px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 2px 12px #0001;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  color: #8b1648;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.logo small {
+  display: block;
+  font-size: 11px;
+  color: #bd8b37;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  text-decoration: none;
+  color: #54243a;
+  font-weight: bold;
+}
+
+nav a:hover {
+  color: #d12b77;
+}
+
+.cart-count {
+  background: #8b1648;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.hero {
+  width: 100%;
+  background: #fce9ef;
+}
+
+.hero img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+.hero-fallback {
+  padding: 65px 20px;
+  text-align: center;
+  background: linear-gradient(120deg,#fce3eb,#fff6ed);
+}
+
+.hero-fallback h1 {
+  color: #8b1648;
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.hero-fallback p {
+  margin-bottom: 20px;
+}
+
+.btn {
+  background: #92164d;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  background: #671035;
+}
+
+.section {
+  padding: 45px 5%;
+}
+
+.section-title {
+  text-align: center;
+  color: #8b1648;
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 15px;
+}
+
+.category {
+  background: #fff;
+  padding: 22px 10px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px #0000000c;
+  cursor: pointer;
+  border: 1px solid #f5dce5;
+}
+
+.category span {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.category:hover {
+  background: #fceaf0;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 20px;
+}
+
+.product {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 15px #00000012;
+  border: 1px solid #f2e3e8;
+}
+
+.product img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  background: #f8e9ee;
+}
+
+.product-info {
+  padding: 14px;
+}
+
+.product h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.price {
+  color: #a51e56;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.product button {
+  width: 100%;
+  margin-top: 7px;
+}
+
+.secondary {
+  background: #f5e3e9;
+  color: #8b1648;
+}
+
+.about {
+  background: #fff0f4;
+  text-align: center;
+  line-height: 1.9;
+}
+
+footer {
+  background: #54132f;
+  color: white;
+  padding: 30px 15px;
+  text-align: center;
+  line-height: 2;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #0009;
+  z-index: 100;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  max-width: 520px;
+  margin: 20px auto;
+  padding: 23px;
+  border-radius: 14px;
+}
+
+.modal-content h2 {
+  text-align: center;
+  color: #92164d;
+  margin-bottom: 18px;
+}
+
+.close {
+  float: right;
+  font-size: 25px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+label {
+  display: block;
+  margin-top: 13px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+.payment-box {
+  display: none;
+  padding: 14px;
+  background: #fff2e9;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.payment-box p {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.payment-number {
+  color: #a51e56;
+  font-weight: bold;
+}
+
+.order-total {
+  padding: 13px;
+  margin-top: 12px;
+  background: #fff0f4;
+  color: #92164d;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 20px;
+}
+
+@media(max-width:800px) {
+  .products {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .categories {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  header {
+    justify-content: center;
+  }
+
+  nav {
+    justify-content: center;
+  }
+
+  .product img {
+    height: 190px;
+  }
+}
+
+@media(max-width:400px) {
+  .products {
+    gap: 10px;
+  }
+
+  .product img {
+    height: 155px;
+  }
+
+  .section {
+    padding: 30px 12px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<header class="topbar">
-  <button class="menu-btn" id="menuToggle">☰</button>
-  <a class="brand" href="#" data-page="home">
-    ARENA<span>X</span>
-    <small>FREE FIRE TOURNAMENT</small>
-  </a>
-  <div class="top-actions">
-    <button class="btn outline" id="topLogin" data-page="account">লগইন</button>
-    <button class="btn primary" id="topSignup" data-page="account">সাইন আপ</button>
+<header>
+  <div class="logo">
+    Jannat Outfit's
+    <small>WEAR YOUR MODESTY</small>
   </div>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#categories">Categories</a>
+    <a href="#products">Shop</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a href="#" onclick="openCart();return false;">
+      Cart <span class="cart-count" id="cartCount">0</span>
+    </a>
+  </nav>
 </header>
 
-<aside class="drawer" id="drawer">
-  <button class="drawer-close" id="drawerClose">×</button>
-  <div class="brand drawer-brand">ARENA<span>X</span><small>PLAYER MENU</small></div>
-  <button data-page="home">⌂　হোম</button>
-  <button data-page="tournaments">🏆　টুর্নামেন্ট</button>
-  <button data-page="myMatches">🎮　আমার ম্যাচ</button>
-  <button data-page="wallet">▣　ওয়ালেট</button>
-  <button data-page="leaderboard">🥇　লিডারবোর্ড</button>
-  <button data-page="account">♙　অ্যাকাউন্ট</button>
-  <button data-page="contact">☎　যোগাযোগ</button>
-  <button data-page="admin" id="drawerAdmin" class="hide">⚙　Admin Panel</button>
-</aside>
-<div class="scrim" id="scrim"></div>
+<!-- HERO BANNER -->
+<section class="hero" id="home">
+  <img
+    src="banner.png"
+    alt="Jannat Outfit's Banner"
+    onerror="this.style.display='none';document.getElementById('heroFallback').style.display='block';"
+  >
 
-<main class="container">
-<div id="message" class="toast hide" role="status"></div>
-
-<!-- HOME -->
-<section class="page active" id="page-home">
-  <div class="hero">
-    <div class="hero-copy">
-      <div class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</div>
-      <h1>RULE THE<br><span>BATTLEGROUND.</span></h1>
-      <p>Solo, Duo ও Squad ম্যাচে অংশ নাও। নিজের স্কিল দেখাও, জিতো পুরস্কার।</p>
-      <div class="hero-actions">
-        <button class="btn primary" data-page="tournaments">টুর্নামেন্ট দেখো →</button>
-        <button class="btn outline" data-page="account">এখনই Join করো</button>
-      </div>
-    </div>
-    <div class="hero-emblem">
-      <div class="ring">♛</div>
-      <b>ARENA X</b>
-      <small>CHAMPIONS ARE MADE HERE</small>
-    </div>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><b>SOLO • DUO • SQUAD</b><small>একাধিক ম্যাচ মোড</small></div>
-    <div class="stat"><b>৳ BDT</b><small>bKash ও Nagad</small></div>
-    <div class="stat"><b>24/7</b><small>কমিউনিটি সাপোর্ট</small></div>
-  </div>
-
-  <div class="section-head">
-    <div><div class="eyebrow">PLAY & WIN</div><h2>চলমান টুর্নামেন্ট</h2></div>
-    <button class="text-btn" data-page="tournaments">সব দেখো →</button>
-  </div>
-  <div id="homeTournamentList" class="tournament-grid">
-    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
-  </div>
-
-  <div class="contact-strip">
-    <div><b>সাহায্য লাগবে?</b><small>আমাদের সাথে যোগাযোগ করো</small></div>
-    <a class="btn primary" href="tel:01346022330">কল করো: 01346022330</a>
+  <div class="hero-fallback" id="heroFallback" style="display:none">
+    <h1>Jannat Outfit's</h1>
+    <p>Wear Your Modesty | Premium Modest Fashion</p>
+    <a href="#products" class="btn">Shop Now</a>
   </div>
 </section>
 
-<!-- TOURNAMENTS -->
-<section class="page" id="page-tournaments">
-  <div class="page-heading">
-    <div class="eyebrow">FIND YOUR MATCH</div>
-    <h2>সব টুর্নামেন্ট</h2>
-    <p>পছন্দের ম্যাচ বেছে রেজিস্ট্রেশন করো।</p>
-  </div>
-  <div id="tournamentList" class="tournament-grid">
-    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
+<!-- CATEGORIES -->
+<section class="section" id="categories">
+  <h2 class="section-title">Our Collections</h2>
+
+  <div class="categories">
+    <div class="category" onclick="filterProducts('Burqa')">
+      <span>🧕</span> Burqa & Abaya
+    </div>
+
+    <div class="category" onclick="filterProducts('Hijab')">
+      <span>🧣</span> Hijab
+    </div>
+
+    <div class="category" onclick="filterProducts('Niqab')">
+      <span>🌸</span> Niqab
+    </div>
+
+    <div class="category" onclick="filterProducts('Dress')">
+      <span>👗</span> Ladies Dress
+    </div>
   </div>
 </section>
 
-<!-- MY MATCHES + JOIN -->
-<section class="page" id="page-myMatches">
-  <div class="page-heading">
-    <div class="eyebrow">PLAYER ZONE</div>
-    <h2>আমার ম্যাচ</h2>
-    <p>তোমার রেজিস্ট্রেশন ও ম্যাচের তথ্য।</p>
-  </div>
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <h2 class="section-title">Our Products</h2>
 
-  <div class="panel">
-    <div id="myMatchesList" class="empty">ম্যাচ দেখতে Login করো।</div>
-  </div>
+  <div class="products" id="productList"></div>
+</section>
 
-  <div class="panel form-panel join-panel">
-    <div class="join-heading">
-      <div>
-        <div class="eyebrow">ENTER THE BATTLE</div>
-        <h3>টুর্নামেন্টে Join করো</h3>
-        <p>সঠিক Game তথ্য দিয়ে রেজিস্ট্রেশন সম্পন্ন করো।</p>
+<!-- ABOUT -->
+<section class="section about" id="about">
+  <h2 class="section-title">About Jannat Outfit's</h2>
+  <p>
+    Jannat Outfit's-এ আপনাকে স্বাগতম।
+    আমাদের কাছে পাবেন সুন্দর ও মানসম্মত
+    বোরকা, আবায়া, হিজাব, নিকাব এবং
+    নারীদের পছন্দের পোশাক।
+    আপনার সৌন্দর্য ও শালীনতার জন্য
+    আমাদের আয়োজন।
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <h2>Jannat Outfit's</h2>
+  <p>Wear Your Modesty</p>
+  <p>সারা বাংলাদেশে ডেলিভারি</p>
+  <p>Cash on Delivery Available</p>
+  <p>© 2026 Jannat Outfit's. All Rights Reserved.</p>
+</footer>
+
+<!-- ORDER MODAL -->
+<div class="modal" id="orderModal">
+  <div class="modal-content">
+
+    <button class="close" onclick="closeOrder()">×</button>
+
+    <h2>অর্ডার ফর্ম</h2>
+
+    <form id="orderForm">
+
+      <label>পণ্যের নাম</label>
+      <input type="text" id="orderProduct" name="product" readonly required>
+
+      <label>পণ্যের দাম (৳)</label>
+      <input type="number" id="orderPrice" name="price" readonly required>
+
+      <div class="order-total" id="orderTotal"></div>
+
+      <label>ক্রেতার সম্পূর্ণ নাম</label>
+      <input
+        type="text"
+        name="customerName"
+        placeholder="আপনার নাম"
+        required
+      >
+
+      <label>মোবাইল নম্বর</label>
+      <input
+        type="tel"
+        name="mobile"
+        placeholder="01XXXXXXXXX"
+        pattern="01[0-9]{9}"
+        required
+      >
+
+      <label>বাড়ির সম্পূর্ণ ঠিকানা</label>
+      <textarea
+        name="address"
+        placeholder="গ্রাম, বাড়ি নম্বর, রোড ইত্যাদি"
+        required
+      ></textarea>
+
+      <label>জেলা</label>
+      <input
+        type="text"
+        name="district"
+        placeholder="আপনার জেলার নাম"
+        required
+      >
+
+      <label>উপজেলা</label>
+      <input
+        type="text"
+        name="upazila"
+        placeholder="আপনার উপজেলার নাম"
+        required
+      >
+
+      <label>পেমেন্ট পদ্ধতি</label>
+      <select name="paymentMethod" id="paymentMethod" required>
+        <option value="">পেমেন্ট নির্বাচন করুন</option>
+        <option value="bKash">বিকাশ</option>
+        <option value="Nagad">নগদ</option>
+        <option value="COD">Cash on Delivery</option>
+      </select>
+
+      <div class="payment-box" id="paymentBox">
+
+        <p id="paymentTitle"></p>
+
+        <p>
+          পেমেন্ট নম্বর:
+          <span class="payment-number" id="paymentNumber"></span>
+        </p>
+
+        <label>যে নম্বর থেকে টাকা পাঠিয়েছেন</label>
+        <input
+          type="tel"
+          name="senderNumber"
+          id="senderNumber"
+          placeholder="01XXXXXXXXX"
+        >
+
+        <label>Transaction ID</label>
+        <input
+          type="text"
+          name="transactionId"
+          id="transactionId"
+          placeholder="Transaction ID"
+        >
+
       </div>
-      <div class="join-icon">🏆</div>
-    </div>
 
-    <form id="registrationForm" class="form-grid">
-      <label>টুর্নামেন্ট বেছে নাও
-        <select name="tournamentId" id="tournamentSelect" required>
-          <option value="">টুর্নামেন্ট বেছে নাও</option>
-        </select>
-      </label>
+      <button class="btn submit-btn" type="submit">
+        অর্ডার কনফার্ম করুন
+      </button>
 
-      <label>Player / Team Name
-        <input name="playerName" maxlength="40" placeholder="তোমার নাম বা Team Name" required>
-      </label>
-
-      <label>Game Username
-        <input name="gameUsername" maxlength="40" placeholder="Free Fire-এর In-game নাম" required>
-      </label>
-
-      <label>Free Fire UID
-        <input name="uid" inputmode="numeric" pattern="[0-9]{5,20}" placeholder="তোমার Free Fire UID" required>
-      </label>
-
-      <label>Team Name (Duo / Squad)
-        <input name="teamName" maxlength="40" placeholder="Team Name (ঐচ্ছিক)">
-      </label>
-
-      <div class="join-note">
-        <b>⚠️ গুরুত্বপূর্ণ</b>
-        <p>Game Username ও UID সঠিকভাবে লিখবে। ভুল তথ্য দিলে ম্যাচে অংশ নিতে সমস্যা হতে পারে।</p>
-      </div>
-
-      <button class="btn primary join-submit" type="submit">🏆 রেজিস্ট্রেশন পাঠাও</button>
     </form>
   </div>
-</section>
+</div>
 
-<!-- WALLET -->
-<section class="page" id="page-wallet">
-  <div class="page-heading">
-    <div class="eyebrow">PLAYER FUNDS</div>
-    <h2>আমার ওয়ালেট</h2>
-    <p>টাকা পাঠানোর পর Transaction ID জমা দাও।</p>
+<!-- CART MODAL -->
+<div class="modal" id="cartModal">
+  <div class="modal-content">
+    <button class="close" onclick="closeCart()">×</button>
+    <h2>আপনার কার্ট</h2>
+
+    <div id="cartItems"></div>
+
+    <button class="btn submit-btn" onclick="checkoutCart()">
+      অর্ডার করুন
+    </button>
   </div>
+</div>
 
-  <div class="wallet-balance">
-    <small>অনুমোদিত আনুমানিক ব্যালেন্স</small>
-    <strong id="balance">৳ 0.00</strong>
-    <span>Admin যাচাই করার পর ব্যালেন্স আপডেট হবে</span>
-  </div>
+<script>
 
-  <div class="cols">
-    <div class="panel form-panel">
-      <h3>টাকা জমা (Deposit)</h3>
-      <div class="pay-number">
-        <small>আমাদের bKash / Nagad নম্বর</small>
-        <strong>01346022330</strong>
-        <button class="copy-btn" id="copyNumber" type="button">নম্বর কপি</button>
+// নিজের আসল পেমেন্ট নম্বর বসাবে
+const BKASH_NUMBER = "01XXXXXXXXX";
+const NAGAD_NUMBER = "01XXXXXXXXX";
+
+// নমুনা পণ্য
+const products = [
+  {
+    id: 1,
+    name: "Premium Black Burqa",
+    category: "Burqa",
+    price: 1500,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Black+Burqa"
+  },
+  {
+    id: 2,
+    name: "Luxury Dubai Abaya",
+    category: "Burqa",
+    price: 2200,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Dubai+Abaya"
+  },
+  {
+    id: 3,
+    name: "Premium Hijab",
+    category: "Hijab",
+    price: 450,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Premium+Hijab"
+  },
+  {
+    id: 4,
+    name: "Soft Chiffon Hijab",
+    category: "Hijab",
+    price: 350,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Chiffon+Hijab"
+  },
+  {
+    id: 5,
+    name: "Premium Niqab",
+    category: "Niqab",
+    price: 300,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Premium+Niqab"
+  },
+  {
+    id: 6,
+    name: "Stylish Ladies Dress",
+    category: "Dress",
+    price: 1800,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Ladies+Dress"
+  },
+  {
+    id: 7,
+    name: "Elegant Abaya",
+    category: "Burqa",
+    price: 1950,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Elegant+Abaya"
+  },
+  {
+    id: 8,
+    name: "Premium Scarf",
+    category: "Hijab",
+    price: 500,
+    image: "https://placehold.co/500x500/f3e2e8/852047?text=Premium+Scarf"
+  }
+];
+
+let cart = [];
+let selectedProduct = null;
+
+function showProducts(list) {
+  const container = document.getElementById("productList");
+  container.innerHTML = "";
+
+  list.forEach(product => {
+    container.innerHTML += `
+      <div class="product">
+        <img src="${product.image}" alt="${product.name}">
+        <div class="product-info">
+          <h3>${product.name}</h3>
+          <p class="price">৳${product.price}</p>
+
+          <button class="btn"
+            onclick="buyNow(${product.id})">
+            Buy Now
+          </button>
+
+          <button class="btn secondary"
+            onclick="addToCart(${product.id})">
+            Add to Cart
+          </button>
+        </div>
       </div>
-      <p class="hint">Send Money করার পর Transaction ID দাও। PIN বা OTP কখনো দেবে না।</p>
+    `;
+  });
+}
 
-      <form id="paymentForm">
-        <input type="hidden" name="type" value="deposit">
-        <label>পরিমাণ (BDT)
-          <input name="amount" type="number" min="1" max="100000" step="1" required>
-        </label>
-        <label>পেমেন্ট মাধ্যম
-          <select name="method">
-            <option value="bKash">bKash</option>
-            <option value="Nagad">Nagad</option>
-          </select>
-        </label>
-        <label>Transaction ID
-          <input name="reference" minlength="4" maxlength="100" required>
-        </label>
-        <button class="btn primary" type="submit">Deposit Request পাঠাও</button>
-      </form>
-    </div>
+function filterProducts(category) {
+  const filtered = products.filter(
+    p => p.category === category
+  );
 
-    <div class="panel form-panel">
-      <h3>টাকা উত্তোলন (Withdraw)</h3>
-      <p class="hint">আপনার Wallet-এর available balance থেকে Withdraw request পাঠান। Admin Approve করলে টাকা পাঠানো হবে।</p>
-      <form id="withdrawForm">
-        <label>পরিমাণ (BDT)
-          <input name="amount" type="number" min="1" max="100000" step="1" required>
-        </label>
-        <label>পেমেন্ট মাধ্যম
-          <select name="method" required>
-            <option value="bKash">bKash</option>
-            <option value="Nagad">Nagad</option>
-          </select>
-        </label>
-        <label>যে নম্বরে টাকা নিতে চান
-          <input name="accountNumber" type="tel" inputmode="numeric" pattern="01[3-9][0-9]{8}" maxlength="11" placeholder="01XXXXXXXXX" required>
-        </label>
-        <button class="btn primary" type="submit">Withdraw Request পাঠাও</button>
-      </form>
-    </div>
+  showProducts(filtered);
+  document.getElementById("products").scrollIntoView();
+}
 
-    <div class="panel">
-      <h3>লেনদেনের ইতিহাস</h3>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>ধরন</th><th>টাকা</th><th>মাধ্যম</th><th>অবস্থা</th></tr></thead>
-          <tbody id="paymentRows">
-            <tr><td colspan="4">Login করলে দেখা যাবে।</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+function buyNow(id) {
+  selectedProduct = products.find(p => p.id === id);
 
-  <div class="notice">
-    গুরুত্বপূর্ণ: এটি Manual bKash/Nagad verification। Admin যাচাই করে Approve করলে ব্যালেন্স আপডেট হবে।
-  </div>
-</section>
+  document.getElementById("orderProduct").value =
+    selectedProduct.name;
 
-<!-- LEADERBOARD -->
-<section class="page" id="page-leaderboard">
-  <div class="page-heading">
-    <div class="eyebrow">TOP PLAYERS</div>
-    <h2>লিডারবোর্ড</h2>
-    <p>সেরা খেলোয়াড়দের তালিকা।</p>
-  </div>
-  <div class="panel table-scroll">
-    <table>
-      <thead><tr><th>র‍্যাংক</th><th>প্লেয়ার</th><th>পজিশন</th><th>পয়েন্ট</th></tr></thead>
-      <tbody id="leaderboardRows">
-        <tr><td colspan="4">এখনো ফলাফল প্রকাশ হয়নি।</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+  document.getElementById("orderPrice").value =
+    selectedProduct.price;
 
-<!-- ACCOUNT -->
-<section class="page" id="page-account">
-  <div class="page-heading">
-    <div class="eyebrow">PLAYER ACCESS</div>
-    <h2>অ্যাকাউন্ট</h2>
-    <p>নতুন অ্যাকাউন্ট খোলো অথবা Login করো।</p>
-  </div>
+  document.getElementById("orderTotal").textContent =
+    "সর্বমোট: ৳" + selectedProduct.price;
 
-  <div class="cols">
-    <form id="signup" class="panel form-panel">
-      <h3>নতুন অ্যাকাউন্ট</h3>
-      <label>তোমার নাম
-        <input name="name" maxlength="40" required>
-      </label>
-      <label>Email
-        <input name="email" type="email" required>
-      </label>
-      <label>Password (কমপক্ষে ৬ অক্ষর)
-        <input name="password" type="password" minlength="6" required>
-      </label>
-      <button class="btn primary" type="submit">সাইন আপ</button>
-    </form>
+  document.getElementById("orderModal").style.display =
+    "block";
+}
 
-    <form id="login" class="panel form-panel">
-      <h3>Welcome Back</h3>
-      <label>Email
-        <input name="email" type="email" required>
-      </label>
-      <label>Password
-        <input name="password" type="password" required>
-      </label>
-      <button class="btn primary" type="submit">লগইন</button>
-    </form>
-  </div>
+function closeOrder() {
+  document.getElementById("orderModal").style.display =
+    "none";
+}
 
-  <div id="loggedInPanel" class="panel form-panel" style="display:none">
-    <h3>আমার প্রোফাইল</h3>
-    <div class="profile-editor">
-      <img id="profilePreview" class="profile-avatar" src="https://www.gravatar.com/avatar/?d=mp&s=160" alt="Profile picture">
-      <div>
-        <label>প্রোফাইল ছবি
-          <input id="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp">
-        </label>
-        <small class="hint">JPG, PNG বা WebP • সর্বোচ্চ ৫ MB</small>
-      </div>
-    </div>
-    <form id="profileForm" class="form-grid">
-      <label>Display Name
-        <input id="displayNameInput" name="displayName" maxlength="40" required>
-      </label>
-      <button class="btn primary" type="submit">প্রোফাইল আপডেট</button>
-    </form>
-    <p id="session" class="hint">Logged in</p>
-    <button class="btn outline" type="button" id="logout">লগআউট</button>
-  </div>
-</section>
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  const existing = cart.find(p => p.id === id);
 
-<!-- CONTACT -->
-<section class="page" id="page-contact">
-  <div class="page-heading">
-    <div class="eyebrow">WE ARE HERE TO HELP</div>
-    <h2>যোগাযোগ</h2>
-    <p>সাহায্যের জন্য যোগাযোগ করো।</p>
-  </div>
-  <div class="panel contact-card">
-    <div class="contact-icon">☎</div>
-    <h3>ArenaX Support</h3>
-    <strong>01346022330</strong>
-    <p>কল অথবা WhatsApp-এ যোগাযোগ করতে পারো।</p>
-    <div class="hero-actions">
-      <a class="btn primary" href="tel:01346022330">Call Now</a>
-      <a class="btn outline" href="https://wa.me/8801346022330" target="_blank" rel="noopener">WhatsApp</a>
-    </div>
-  </div>
-</section>
+  if (existing) {
+    existing.quantity++;
+  } else {
+    cart.push({...product, quantity: 1});
+  }
 
-<!-- ADMIN -->
-<section class="page" id="page-admin">
-  <div class="page-heading">
-    <div class="eyebrow">CONTROL CENTER</div>
-    <h2>Admin Panel</h2>
-    <p>শুধু অনুমোদিত Admin এই অংশ ব্যবহার করতে পারবেন।</p>
-  </div>
+  updateCart();
+  alert("পণ্যটি কার্টে যোগ হয়েছে!");
+}
 
-  <div class="panel form-panel">
-    <h3>নতুন টুর্নামেন্ট তৈরি</h3>
-    <form id="createTournament" class="form-grid">
-      <label>টুর্নামেন্টের নাম<input name="title" maxlength="100" required></label>
-      <label>মোড
-        <select name="mode"><option>Solo</option><option>Duo</option><option>Squad</option></select>
-      </label>
-      <label>বর্ণনা<input name="description" maxlength="400"></label>
-      <label>Entry Fee (৳)<input name="entryFee" type="number" min="0" required></label>
-      <label>Prize Pool (৳)<input name="prizePool" type="number" min="0" required></label>
-      <label>সর্বোচ্চ Slot<input name="slots" type="number" min="1" max="500" value="48" required></label>
-      <label>ম্যাচের সময়<input name="startsAt" type="datetime-local"></label>
-      <button class="btn primary" type="submit">টুর্নামেন্ট Publish</button>
-    </form>
-  </div>
+function updateCart() {
+  const count = cart.reduce(
+    (sum,p) => sum + p.quantity, 0
+  );
 
-  <div class="panel">
-    <h3>Pending Payment Requests</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
-        <tbody id="adminPayments"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+  document.getElementById("cartCount").textContent =
+    count;
+}
 
-  <div class="panel">
-    <h3>Pending Withdraw Requests</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
-        <tbody id="adminWithdrawals"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+function openCart() {
+  const modal = document.getElementById("cartModal");
+  const container = document.getElementById("cartItems");
 
-  <div class="panel">
-    <h3>Pending Registrations</h3>
-    <div class="table-scroll">
-      <table>
-        <thead><tr><th>প্লেয়ার</th><th>Game Username</th><th>UID</th><th>টুর্নামেন্ট</th><th>অ্যাকশন</th></tr></thead>
-        <tbody id="adminRegistrations"><tr><td colspan="5">Admin access প্রয়োজন।</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+  modal.style.display = "block";
 
-  <div class="panel form-panel">
-    <h3>ফলাফল Publish</h3>
-    <form id="resultForm" class="form-grid">
-      <label>Player Name<input name="player" required></label>
-      <label>Placement<input name="placement" type="number" min="1" required></label>
-      <label>Points<input name="points" type="number" min="0" required></label>
-      <label>Tournament ID<input name="tournamentId" required></label>
-      <button class="btn primary" type="submit">ফলাফল Publish</button>
-    </form>
-  </div>
-</section>
-</main>
+  if (cart.length === 0) {
+    container.innerHTML =
+      '<div class="empty-cart">আপনার কার্ট খালি।</div>';
+    return;
+  }
 
-<nav class="bottom-nav">
-  <button data-page="home" class="active"><span>⌂</span>হোম</button>
-  <button data-page="tournaments"><span>🏆</span>টুর্নামেন্ট</button>
-  <button data-page="myMatches" class="plus"><span>＋</span>ম্যাচ</button>
-  <button data-page="wallet"><span>▣</span>ওয়ালেট</button>
-  <button data-page="account"><span>♙</span>অ্যাকাউন্ট</button>
-</nav>
+  let total = 0;
+  container.innerHTML = "";
 
-<footer>© 2026 ArenaX • Independent community tournament platform. Not affiliated with Garena / Free Fire.</footer>
-<script type="module" src="app.js"></script>
+  cart.forEach(p => {
+    total += p.price * p.quantity;
+
+    container.innerHTML += `
+      <p style="padding:10px;border-bottom:1px solid #eee">
+        ${p.name} × ${p.quantity}
+        — ৳${p.price * p.quantity}
+      </p>
+    `;
+  });
+
+  container.innerHTML += `
+    <h3 style="margin-top:15px;color:#92164d">
+      মোট: ৳${total}
+    </h3>
+  `;
+}
+
+function closeCart() {
+  document.getElementById("cartModal").style.display =
+    "none";
+}
+
+function checkoutCart() {
+  if (cart.length === 0) {
+    alert("প্রথমে কার্টে পণ্য যোগ করুন।");
+    return;
+  }
+
+  if (cart.length > 1) {
+    alert("ডেমোতে একবারে একটি পণ্য অর্ডার করা যাবে।");
+    return;
+  }
+
+  const item = cart[0];
+  closeCart();
+  buyNow(item.id);
+}
+
+// পেমেন্ট নির্বাচন
+document.getElementById("paymentMethod")
+.addEventListener("change", function() {
+
+  const method = this.value;
+  const box = document.getElementById("paymentBox");
+  const title = document.getElementById("paymentTitle");
+  const number = document.getElementById("paymentNumber");
+
+  const sender = document.getElementById("senderNumber");
+  const trx = document.getElementById("transactionId");
+
+  box.style.display = "none";
+  sender.required = false;
+  trx.required = false;
+
+  if (method === "bKash") {
+    box.style.display = "block";
+    title.textContent = "বিকাশে Send Money করুন";
+    number.textContent = BKASH_NUMBER;
+    sender.required = true;
+    trx.required = true;
+  }
+
+  if (method === "Nagad") {
+    box.style.display = "block";
+    title.textContent = "নগদে Send Money করুন";
+    number.textContent = NAGAD_NUMBER;
+    sender.required = true;
+    trx.required = true;
+  }
+
+});
+
+// ডেমো অর্ডার সাবমিট
+document.getElementById("orderForm")
+.addEventListener("submit", function(event) {
+
+  event.preventDefault();
+
+  const data = Object.fromEntries(
+    new FormData(this).entries()
+  );
+
+  const orderId = "JOF-" + Date.now();
+
+  alert(
+    "ডেমো অর্ডার গ্রহণ করা হয়েছে!\n\n" +
+    "Order ID: " + orderId +
+    "\nপণ্য: " + data.product +
+    "\nদাম: ৳" + data.price +
+    "\nনাম: " + data.customerName +
+    "\nমোবাইল: " + data.mobile +
+    "\nজেলা: " + data.district +
+    "\nউপজেলা: " + data.upazila +
+    "\nপেমেন্ট: " + data.paymentMethod +
+    "\n\nএটি ডেমো অর্ডার।"
+  );
+
+  console.log("Demo Order:", data);
+
+  this.reset();
+  closeOrder();
+});
+
+// প্রথমবার সব পণ্য দেখাবে
+showProducts(products);
+
+</script>
+
 </body>
   </html>
-
-      
+  
