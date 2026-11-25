@@ -1,0 +1,530 @@
+
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d18">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<title>ArenaX — Free Fire Tournament</title>
+<link rel="stylesheet" href="styles.css?v=arenax-20261125-v1">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuToggle">☰</button>
+  <a class="brand" href="#" data-page="home">
+    ARENA<span>X</span>
+    <small>FREE FIRE TOURNAMENT</small>
+  </a>
+  <div class="top-actions">
+    <button class="btn outline" id="topLogin" data-page="profile">লগইন</button>
+    <button class="btn primary" id="topSignup" data-page="profile">সাইন আপ</button>
+  </div>
+</header>
+
+<aside class="drawer" id="drawer">
+  <button class="drawer-close" id="drawerClose">×</button>
+  <div class="brand drawer-brand">ARENA<span>X</span><small>PLAYER MENU</small></div>
+  <button data-page="home">⌂　হোম</button>
+  <button data-page="tournaments">🏆　টুর্নামেন্ট</button>
+  <button data-page="myMatches">🎮　আমার ম্যাচ</button>
+  <button data-page="wallet">▣　ওয়ালেট</button>
+  <button data-page="profile">👑　প্রিমিয়াম প্রোফাইল</button>
+  <button data-page="leaderboard">🥇　লিডারবোর্ড</button>
+  <button data-page="matches">📅　ফিক্সচার ও ফলাফল</button>
+  <button data-page="announcements">📢　নোটিশ</button>
+  <button data-page="profile">♙　প্রোফাইল ও অ্যাকাউন্ট</button>
+  <button data-page="contact">☎　যোগাযোগ</button>
+  <button data-page="admin" id="drawerAdmin" class="hide">⚙　Admin Panel</button>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<main class="container">
+<div id="message" class="toast hide" role="status"></div>
+
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">BANGLADESH • FREE FIRE ESPORTS</div>
+      <h1>RULE THE<br><span>BATTLEGROUND.</span></h1>
+      <p>Solo, Duo ও Squad ম্যাচে অংশ নাও। নিজের স্কিল দেখাও, জিতো পুরস্কার।</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-page="tournaments">টুর্নামেন্ট দেখো →</button>
+        <button class="btn outline" data-page="profile">এখনই Join করো</button>
+        <button class="btn outline" id="installAppBtn" type="button">📲 Install ARENAX</button>
+      </div>
+    </div>
+    <div class="hero-emblem">
+      <div class="ring">♛</div>
+      <b>ARENA X</b>
+      <small>CHAMPIONS ARE MADE HERE</small>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>SOLO • DUO • SQUAD</b><small>একাধিক ম্যাচ মোড</small></div>
+    <div class="stat"><b>৳ BDT</b><small>bKash ও Nagad</small></div>
+    <div class="stat"><b>24/7</b><small>কমিউনিটি সাপোর্ট</small></div>
+  </div>
+
+  <div class="section-head">
+    <div><div class="eyebrow">PLAY & WIN</div><h2>চলমান টুর্নামেন্ট</h2></div>
+    <button class="text-btn" data-page="tournaments">সব দেখো →</button>
+  </div>
+  <div id="homeTournamentList" class="tournament-grid">
+    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
+  </div>
+
+  <div class="contact-strip">
+    <div><b>সাহায্য লাগবে?</b><small>আমাদের সাথে যোগাযোগ করো</small></div>
+    <a class="btn primary" href="tel:01346022330">কল করো: 01346022330</a>
+  </div>
+</section>
+
+<!-- TOURNAMENTS -->
+<section class="page" id="page-tournaments">
+  <div class="page-heading">
+    <div class="eyebrow">FIND YOUR MATCH</div>
+    <h2>সব টুর্নামেন্ট</h2>
+    <p>পছন্দের ম্যাচ বেছে রেজিস্ট্রেশন করো।</p>
+  </div>
+  <div id="tournamentList" class="tournament-grid">
+    <div class="panel">টুর্নামেন্ট লোড হচ্ছে...</div>
+  </div>
+</section>
+
+<!-- MY MATCHES + JOIN -->
+<section class="page" id="page-myMatches">
+  <div class="page-heading">
+    <div class="eyebrow">PLAYER ZONE</div>
+    <h2>আমার ম্যাচ</h2>
+    <p>তোমার রেজিস্ট্রেশন ও ম্যাচের তথ্য।</p>
+  </div>
+
+  <div class="panel">
+    <div id="myMatchesList" class="empty">ম্যাচ দেখতে Login করো।</div>
+  </div>
+
+  <div class="panel form-panel join-panel">
+    <div class="join-heading">
+      <div>
+        <div class="eyebrow">ENTER THE BATTLE</div>
+        <h3>টুর্নামেন্টে Join করো</h3>
+        <p>সঠিক Game তথ্য দিয়ে রেজিস্ট্রেশন সম্পন্ন করো।</p>
+      </div>
+      <div class="join-icon">🏆</div>
+    </div>
+
+    <form id="registrationForm" class="form-grid">
+      <label>টুর্নামেন্ট বেছে নাও
+        <select name="tournamentId" id="tournamentSelect" required>
+          <option value="">টুর্নামেন্ট বেছে নাও</option>
+        </select>
+      </label>
+      <div id="registrationPlayers" class="form-grid" style="grid-column:1/-1">
+        <p class="hint">Tournament বেছে নিলে Solo / Duo / Squad অনুযায়ী Player তথ্যের ঘর আসবে।</p>
+      </div>
+      <label id="teamNameField" style="display:none">Team Name (Duo / Squad — ঐচ্ছিক)
+        <input name="teamName" id="registrationTeamName" maxlength="40" placeholder="তোমার Team Name">
+      </label>
+      <div class="join-note">
+        <b>⚠️ গুরুত্বপূর্ণ</b>
+        <p>প্রতিটি Player-এর সঠিক Free Fire Game Name ও ৫–২০ সংখ্যার UID দিতে হবে। Duo-তে ২ জন এবং Squad-এ ৪ জনের তথ্য আবশ্যক।</p>
+      </div>
+      <button class="btn primary join-submit" type="submit">🏆 রেজিস্ট্রেশন পাঠাও</button>
+    </form>
+  </div>
+</section>
+
+<!-- WALLET -->
+<section class="page" id="page-wallet">
+  <div class="page-heading">
+    <div class="eyebrow">PLAYER FUNDS</div>
+    <h2>আমার ওয়ালেট</h2>
+    <p>টাকা পাঠানোর পর Transaction ID জমা দাও।</p>
+  </div>
+
+  <div class="wallet-balance">
+    <small>অনুমোদিত আনুমানিক ব্যালেন্স</small>
+    <strong id="balance">৳ 0.00</strong>
+    <span>Admin যাচাই করার পর ব্যালেন্স আপডেট হবে</span>
+  </div>
+
+  <div class="cols">
+    <div class="panel form-panel">
+      <h3>টাকা জমা (Deposit)</h3>
+      <div class="pay-number">
+        <small>আমাদের bKash / Nagad নম্বর</small>
+        <strong>01346022330</strong>
+        <button class="copy-btn" id="copyNumber" type="button">নম্বর কপি</button>
+      </div>
+      <p class="hint">Send Money করার পর Transaction ID দাও। PIN বা OTP কখনো দেবে না।</p>
+
+      <form id="paymentForm">
+        <input type="hidden" name="type" value="deposit">
+        <label>পরিমাণ (BDT)
+          <input name="amount" type="number" min="1" max="100000" step="1" required>
+        </label>
+        <label>পেমেন্ট মাধ্যম
+          <select name="method">
+            <option value="bKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+          </select>
+        </label>
+        <label>Transaction ID
+          <input name="reference" minlength="4" maxlength="100" required>
+        </label>
+        <button class="btn primary" type="submit">Deposit Request পাঠাও</button>
+      </form>
+    </div>
+
+    <div class="panel form-panel">
+      <h3>টাকা উত্তোলন (Withdraw)</h3>
+      <p class="hint">আপনার Wallet-এর available balance থেকে Withdraw request পাঠান। Admin Approve করলে টাকা পাঠানো হবে।</p>
+      <form id="withdrawForm">
+        <label>পরিমাণ (BDT)
+          <input name="amount" type="number" min="1" max="100000" step="1" required>
+        </label>
+        <label>পেমেন্ট মাধ্যম
+          <select name="method" required>
+            <option value="bKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+          </select>
+        </label>
+        <label>যে নম্বরে টাকা নিতে চান
+          <input name="accountNumber" type="tel" inputmode="numeric" pattern="01[3-9][0-9]{8}" maxlength="11" placeholder="01XXXXXXXXX" required>
+        </label>
+        <button class="btn primary" type="submit">Withdraw Request পাঠাও</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>লেনদেনের ইতিহাস</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>ধরন</th><th>টাকা</th><th>মাধ্যম</th><th>অবস্থা</th></tr></thead>
+          <tbody id="paymentRows">
+            <tr><td colspan="4">Login করলে দেখা যাবে।</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice">
+    গুরুত্বপূর্ণ: এটি Manual bKash/Nagad verification। Admin যাচাই করে Approve করলে ব্যালেন্স আপডেট হবে।
+  </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section class="page" id="page-leaderboard">
+  <div class="page-heading">
+    <div class="eyebrow">TOP PLAYERS</div>
+    <h2>লিডারবোর্ড</h2>
+    <p>সেরা খেলোয়াড়দের তালিকা।</p>
+  </div>
+  <div class="panel table-scroll">
+    <table>
+      <thead><tr><th>র‍্যাংক</th><th>প্লেয়ার</th><th>পজিশন</th><th>পয়েন্ট</th><th>পুরস্কার (৳)</th></tr></thead>
+      <tbody id="leaderboardRows">
+        <tr><td colspan="5">এখনো ফলাফল প্রকাশ হয়নি।</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ARENAX PREMIUM GAMER PROFILE + ACCOUNT (single page) -->
+<section class="page" id="page-profile">
+ <div class="ax-pro-page">
+  <div class="ax-pro-topline"><span>♛ ARENAX PLAYER PROFILE</span><span class="ax-pro-live"><i></i> PLAYER CENTER</span></div>
+  <div class="ax-pro-main-grid">
+   <section class="ax-pro-player-card" id="premiumProfileBanner">
+    <div class="ax-pro-card-glow"></div>
+    <div class="ax-pro-identity">
+     <div class="ax-pro-avatar-wrap"><div class="ax-pro-avatar" id="profileMainAvatar">👑</div><span id="profileLevelValue">LV. 1</span></div>
+     <div class="ax-pro-user-info"><small class="ax-pro-kicker">ELITE PLAYER ACCOUNT</small><h2 id="profilePlayerName">ARENAX Player <i>✓</i></h2><p id="profilePlayerEmail">@player • Free Fire Competitor</p><div class="ax-pro-uid">UID <b id="profileUid">—</b></div>
+      <div class="ax-pro-rank-chip"><span>♛</span><b id="profileRankName">Rookie</b><small>PLAYER RANK</small></div>
+     </div>
+    </div>
+    <div class="ax-pro-xp-box"><div class="ax-pro-xp-head"><b>⭐ XP Progress</b><span id="profileNextLevel">Next: Level 2</span></div><div class="ax-pro-xp-track"><span id="profileXpBar"></span></div><div class="ax-pro-xp-foot"><b id="profileXpText">0 / 1000 XP</b><span>LEVEL PROGRESS</span></div></div>
+    <div class="ax-pro-stat-grid">
+     <article><span>🏆</span><small>Wins</small><b id="profileWins">0</b></article><article><span>🎮</span><small>Matches</small><b id="profileMatches">0</b></article><article><span>🔥</span><small>Win Rate</small><b id="profileWinRate">0%</b></article><article><span>💰</span><small>Total Coins</small><b id="profileCoins">0</b></article>
+    </div>
+    <div class="ax-pro-wallet-line"><span>💳 Wallet Balance</span><b id="profileWallet">৳ 0.00</b><button type="button" data-page="wallet">OPEN WALLET ↗</button></div>
+   </section>
+
+   <section class="ax-pro-avatar-panel ax-pro-panel">
+    <div class="ax-pro-section-title"><div><small>EXCLUSIVE COLLECTION</small><h3>💎 Avatar Unlock</h3></div><b class="ax-pro-unlock-count" id="profileUnlockCount">1 / 10 Unlocked</b></div>
+    <p class="ax-pro-subtitle">লেভেল বাড়ার সাথে সাথে নতুন অ্যাভাটার আনলক হবে। আনলক করা অ্যাভাটার সিলেক্ট করো।</p>
+    <div class="ax-banner-grid" id="profileBannerGrid"><div class="ax-banner-loading">Avatar Collection loading...</div></div>
+   </section>
+  </div>
+
+  <section class="ax-pro-rank-panel ax-pro-panel">
+   <div class="ax-pro-section-title"><div><small>CLIMB THE LADDER</small><h3>💎 Rank Progression</h3></div><div class="ax-pro-current-rank">Current Rank <b id="profileCurrentRank">♛ Rookie</b></div></div>
+   <div class="ax-pro-rank-track" id="profileRankTrack">
+    <div class="ax-pro-rank-step"><span>🛡️</span><b>1. Rookie</b></div><i>➜</i><div class="ax-pro-rank-step"><span>🟤</span><b>2. Bronze</b></div><i>➜</i><div class="ax-pro-rank-step"><span>🥈</span><b>3. Silver</b></div><i>➜</i><div class="ax-pro-rank-step"><span>🥇</span><b>4. Gold</b></div><i>➜</i><div class="ax-pro-rank-step"><span>💠</span><b>5. Platinum</b></div><i>➜</i><div class="ax-pro-rank-step"><span>💎</span><b>6. Diamond</b></div><i>➜</i><div class="ax-pro-rank-step"><span>🔱</span><b>7. Heroic</b></div><i>➜</i><div class="ax-pro-rank-step"><span>💜</span><b>8. Master</b></div><i>➜</i><div class="ax-pro-rank-step"><span>👑</span><b>9. Grandmaster</b></div><i>➜</i><div class="ax-pro-rank-step"><span>♛</span><b>10. ARENAX Legend</b></div>
+   </div>
+  </section>
+
+  <section class="ax-pro-achievement"><div class="ax-pro-achievement-copy"><small>YOUR JOURNEY TO GREATNESS</small><h2 id="profileAchievementTitle">Level 1 In Progress!</h2><p id="profileAchievementText">Keep playing and become an ARENAX Legend.</p></div><div class="ax-pro-achievement-crown">♛</div><strong>★ EXCLUSIVE ARENAX PLAYER ★</strong></section>
+
+  <section class="ax-pro-account ax-pro-panel">
+   <div class="ax-pro-section-title"><div><small>PLAYER ACCOUNT</small><h3>⚙ Account & Settings</h3></div></div>
+   <div class="ax-account-forms">
+    <form id="signup" class="panel form-panel"><h3>নতুন অ্যাকাউন্ট</h3><label>তোমার নাম<input name="name" maxlength="40" required></label><label>Email<input name="email" type="email" required></label><label>Password (কমপক্ষে ৬ অক্ষর)<input name="password" type="password" minlength="6" required></label><button class="btn primary" type="submit">সাইন আপ</button></form>
+    <form id="login" class="panel form-panel"><h3>Welcome Back</h3><label>Email<input name="email" type="email" required></label><label>Password<input name="password" type="password" required></label><button class="btn primary" type="submit">লগইন</button></form>
+   </div>
+   <div id="loggedInPanel" class="panel form-panel" style="display:none"><h3>অ্যাকাউন্ট সেটিংস</h3><form id="profileForm" class="form-grid"><label>Display Name<input id="displayNameInput" name="displayName" maxlength="40" required></label><button class="btn primary" type="submit">প্রোফাইল আপডেট</button></form><p id="session" class="hint">Logged in</p><button class="btn outline" type="button" id="logout">লগআউট</button></div>
+  </section>
+  <p class="ax-pro-footnote">🔒 Locked avatar নির্দিষ্ট Level-এ আনলক হবে। নির্বাচিত অ্যাভাটার তোমার অ্যাকাউন্টে সেভ থাকবে।</p>
+ </div>
+</section>
+
+
+<!-- FIXTURES, LIVE MATCHES AND RESULTS -->
+<section class="page" id="page-matches">
+  <div class="page-heading"><div class="eyebrow">MATCH CENTER</div><h2>ফিক্সচার ও ফলাফল</h2><p>আসন্ন ম্যাচ, Room তথ্য এবং প্রকাশিত ফলাফল।</p></div>
+  <div class="panel"><h3>ম্যাচ ফিক্সচার</h3><div id="publicMatches" class="match-list"><p class="hint">ম্যাচ লোড হচ্ছে...</p></div></div>
+  <div class="panel"><h3>সাম্প্রতিক ফলাফল</h3><div id="publicResults" class="table-scroll"><p class="hint">ফলাফল লোড হচ্ছে...</p></div></div>
+</section>
+<section class="page" id="page-announcements">
+  <div class="page-heading"><div class="eyebrow">ARENAX UPDATES</div><h2>নোটিশ ও ঘোষণা</h2><p>টুর্নামেন্টের গুরুত্বপূর্ণ আপডেট এখানে দেখো।</p></div>
+  <div id="publicAnnouncements" class="announcement-list"><div class="panel">নোটিশ লোড হচ্ছে...</div></div>
+  <div class="panel form-panel"><h3>অভিযোগ / Dispute জমা</h3><p class="hint">ম্যাচ বা রেজিস্ট্রেশন সংক্রান্ত সমস্যা লিখে প্রমাণের Screenshot URL যুক্ত করো।</p>
+    <form id="disputeForm" class="form-grid"><label>বিষয়<input name="subject" maxlength="100" required></label><label>টুর্নামেন্ট ID (ঐচ্ছিক)<input name="tournamentId" maxlength="120"></label><label style="grid-column:1/-1">বিস্তারিত<textarea name="details" maxlength="1500" rows="4" required></textarea></label><label style="grid-column:1/-1">প্রমাণের Screenshot URL (ঐচ্ছিক)<input name="evidenceUrl" type="url" maxlength="1500" placeholder="https://..."></label><button class="btn primary" type="submit">অভিযোগ জমা দাও</button></form>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="page" id="page-contact">
+  <div class="page-heading">
+    <div class="eyebrow">WE ARE HERE TO HELP</div>
+    <h2>যোগাযোগ</h2>
+    <p>সাহায্যের জন্য যোগাযোগ করো।</p>
+  </div>
+  <div class="panel contact-card">
+    <div class="contact-icon">☎</div>
+    <h3>ArenaX Support</h3>
+    <strong>01346022330</strong>
+    <p>কল অথবা WhatsApp-এ যোগাযোগ করতে পারো।</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="tel:01346022330">Call Now</a>
+      <a class="btn outline" href="https://wa.me/8801346022330" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section class="page" id="page-admin">
+  <div class="page-heading">
+    <div class="eyebrow">CONTROL CENTER</div>
+    <h2>Admin Panel</h2>
+    <p>শুধু অনুমোদিত Admin এই অংশ ব্যবহার করতে পারবেন।</p>
+  </div>
+
+  <div class="panel form-panel">
+    <h3>নতুন টুর্নামেন্ট তৈরি</h3>
+    <form id="createTournament" class="form-grid">
+      <label>টুর্নামেন্টের নাম<input name="title" maxlength="100" required></label>
+      <label>মোড
+        <select name="mode">
+          <option>Solo</option>
+          <option>Duo</option>
+          <option>Squad</option>
+        </select>
+      </label>
+      <label>বর্ণনা<input name="description" maxlength="400"></label>
+
+      <!-- FIXED: Banner URL field moved inside the tournament form -->
+      <label>Tournament Banner Image URL
+        <input name="bannerUrl" type="url" maxlength="2000" placeholder="https://example.com/banner.jpg">
+      </label>
+
+      <label>Entry Fee (৳)<input name="entryFee" type="number" min="0" required></label>
+      <label>Prize Pool (৳)<input name="prizePool" type="number" min="0" required></label>
+      <label>সর্বোচ্চ Slot<input name="slots" type="number" min="1" max="500" value="48" required></label>
+      <label>ম্যাচের সময়<input name="startsAt" type="datetime-local"></label>
+      <label>Format<select name="format"><option value="Knockout">Knockout</option><option value="League">League</option><option value="Round Robin">Round Robin</option><option value="Custom">Custom</option></select></label>
+      <label>Rules & Regulations<input name="rules" maxlength="1500" placeholder="টুর্নামেন্টের নিয়মাবলি"></label>
+      <label>Registration Status<select name="registrationStatus"><option value="open">Open</option><option value="closed">Closed</option></select></label>
+      <button class="btn primary" type="submit">টুর্নামেন্ট Publish</button>
+    </form>
+  </div>
+
+  <div class="panel form-panel">
+    <h3>ম্যাচ Room ID ও Password সেট করো</h3>
+    <p>এগুলো শুধু ওই টুর্নামেন্টে Approved প্লেয়াররা তাদের My Matches অংশে দেখতে পাবে।</p>
+    <form id="roomDetailsForm" class="form-grid">
+      <label>টুর্নামেন্ট
+        <select name="tournamentId" id="adminRoomTournament" required>
+          <option value="">টুর্নামেন্ট বেছে নাও</option>
+        </select>
+      </label>
+      <label>Room ID<input name="roomId" maxlength="80" required></label>
+      <label>Room Password<input name="roomPassword" maxlength="80" required></label>
+      <button class="btn primary" type="submit">Room Details পাঠাও</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h3>Pending Payment Requests</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
+        <tbody id="adminPayments"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Pending Withdraw Requests</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>ইউজার</th><th>বিস্তারিত</th><th>অ্যাকশন</th></tr></thead>
+        <tbody id="adminWithdrawals"><tr><td colspan="3">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Pending Registrations</h3>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>প্লেয়ার</th>
+            <th>Game Username</th>
+            <th>Game UID</th>
+            <th>Player userId</th>
+            <th>অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody id="adminRegistrations"><tr><td colspan="5">Admin access প্রয়োজন।</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <div class="panel form-panel">
+    <h3>ম্যাচ ফিক্সচার তৈরি</h3><p class="hint">প্রতিটি ম্যাচ আলাদাভাবে তৈরি করো। ফলাফল পরে ম্যাচ আপডেট থেকে প্রকাশ করা যাবে।</p>
+    <form id="createMatchForm" class="form-grid">
+      <label>টুর্নামেন্ট<select name="tournamentId" id="matchTournamentSelect" required><option value="">Tournament বেছে নাও</option></select></label>
+      <label>Round / Stage<input name="round" maxlength="60" placeholder="Round 1 / Final" required></label>
+      <label>Team / Player 1<input name="participant1" maxlength="80" required></label>
+      <label>Team / Player 2<input name="participant2" maxlength="80" required></label>
+      <label>ম্যাচের সময়<input name="startsAt" type="datetime-local" required></label>
+      <label>Match Status<select name="status"><option value="upcoming">Upcoming</option><option value="live">Live</option></select></label>
+      <button class="btn primary" type="submit">ফিক্সচার তৈরি</button>
+    </form>
+  </div>
+  <div class="panel form-panel"><h3>ম্যাচ স্কোর আপডেট</h3>
+    <form id="updateMatchForm" class="form-grid"><label>Match ID<input name="matchId" required placeholder="Fixture তালিকা থেকে ID কপি করো"></label><label>Player / Team 1 Score<input name="score1" type="number" min="0" required></label><label>Player / Team 2 Score<input name="score2" type="number" min="0" required></label><label>Status<select name="status"><option value="live">Live</option><option value="completed">Completed</option></select></label><button class="btn primary" type="submit">স্কোর আপডেট</button></form>
+  </div>
+  <div class="panel form-panel"><h3>নোটিশ প্রকাশ</h3><form id="announcementForm" class="form-grid"><label>শিরোনাম<input name="title" maxlength="120" required></label><label>ধরন<select name="type"><option value="general">সাধারণ</option><option value="urgent">জরুরি</option><option value="match">ম্যাচ আপডেট</option></select></label><label style="grid-column:1/-1">বিস্তারিত<textarea name="body" maxlength="2000" rows="4" required></textarea></label><button class="btn primary" type="submit">নোটিশ Publish</button></form></div>
+  <div class="panel"><h3>Player Disputes</h3><div class="table-scroll"><table><thead><tr><th>Player</th><th>বিষয়</th><th>বিস্তারিত</th><th>প্রমাণ</th><th>অবস্থা</th></tr></thead><tbody id="adminDisputes"><tr><td colspan="5">Admin access প্রয়োজন।</td></tr></tbody></table></div></div>
+  <div class="panel"><h3>সব Fixture / Match ID</h3><div class="table-scroll"><table><thead><tr><th>Match ID</th><th>Match</th><th>সময়</th><th>Status</th></tr></thead><tbody id="adminMatches"><tr><td colspan="4">Admin access প্রয়োজন।</td></tr></tbody></table></div></div>
+
+  <div class="panel form-panel">
+    <h3>ফলাফল Publish</h3>
+    <form id="resultForm" class="form-grid">
+      <label>Player Name<input name="player" required></label>
+      <label>Winner Player userId (Prize দিলে আবশ্যক)<input name="userId" autocomplete="off"></label>
+      <label>Placement<input name="placement" type="number" min="1" required></label>
+      <label>Points<input name="points" type="number" min="0" required></label>
+      <label>Winning Prize (৳)<input name="prizeAmount" type="number" min="0" step="0.01" value="0" required></label>
+      <label>Tournament ID<input name="tournamentId" required></label>
+      <button class="btn primary" type="submit">ফলাফল Publish</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<nav class="bottom-nav">
+  <button data-page="home" class="active"><span>⌂</span>হোম</button>
+  <button data-page="tournaments"><span>🏆</span>টুর্নামেন্ট</button>
+  <button data-page="myMatches" class="plus"><span>＋</span>ম্যাচ</button>
+  <button data-page="wallet"><span>▣</span>ওয়ালেট</button>
+  <button data-page="profile"><span>👑</span>প্রোফাইল</button>
+  <button data-page="matches"><span>📅</span>ম্যাচ</button>
+  <button data-page="contact"><span>🎧</span>সাপোর্ট</button>
+</nav>
+
+<footer>© 2026 ArenaX • Independent community tournament platform. Not affiliated with Garena / Free Fire.</footer>
+
+<script>
+(() => {
+  const installButton = document.getElementById("installAppBtn");
+  let deferredInstallPrompt = null;
+
+  const isInstalled = () =>
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+
+  if (isInstalled() && installButton) {
+    installButton.style.display = "none";
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+
+    if (installButton && !isInstalled()) {
+      installButton.style.display = "";
+      installButton.textContent = "📲 Install ARENAX";
+    }
+  });
+
+  installButton?.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      alert("Chrome-এর ⋮ মেনু থেকে Install app চাপুন।");
+      return;
+    }
+
+    try {
+      await deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+
+      if (choice.outcome === "accepted") {
+        installButton.style.display = "none";
+      }
+    } catch (error) {
+      console.error("Install error:", error);
+    }
+
+    deferredInstallPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    if (installButton) installButton.style.display = "none";
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+      try {
+        const registration = await navigator.serviceWorker.register(
+          "./service-worker.js",
+          { scope: "./" }
+        );
+
+        console.log("ARENAX PWA Ready:", registration.scope);
+      } catch (error) {
+        console.error("Service Worker Error:", error);
+      }
+    });
+  }
+})();
+</script>
+
+<script type="module" src="./app.js?v=arenax-20261125-v1"></script>
+
+</body>
+                        </html>
+
+        
